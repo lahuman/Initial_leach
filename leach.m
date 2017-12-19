@@ -1,9 +1,9 @@
 
 
 clear;
-sensing_data = csvread('day_data.csv')
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% PARAMETERS %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% PARAMETERS %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+sensing_data = csvread('day_data.csv')
 %Field Dimensions - x and y maximum (in meters)
 xm = 300;
 ym = 300;
@@ -41,6 +41,12 @@ rmax=1000;
 
 do=sqrt(Efs/Emp);
 
+% 초기값 처리 여부
+IS_INITIL_LEACH = false;
+
+leach_data = [];
+initil_leach_data = [];
+
 %Creation of the random Sensor Network
 figure(1);
 for i=1:1:n
@@ -49,199 +55,243 @@ for i=1:1:n
     S(i).yd=rand(1,1)*ym;
     YR(i)=S(i).yd;
     S(i).G=0;
-    %initially there are no cluster heads only nodes
-    S(i).type='N';
-    S(i).E=Eo;
-    S(i).ENERGY=0;
     % hold on;
 end
 
-S(n+1).xd=sink.x;
-S(n+1).yd=sink.y;
-            
-%First Iteration
-figure(1);
-
-%counter for CHs
-countCHs=0;
-%counter for CHs per round
-rcountCHs=0;
-cluster=1;
-
-countCHs;
-rcountCHs=rcountCHs+countCHs;
-flag_first_dead=0; 
-
-for r=0:1:rmax 
- r
-  %Operation for epoch
-  if(mod(r, round(1/p))==0)
-     for i=1:1:n
-        S(i).G=0;
-        S(i).cl=0;
-     end
-  end
-
-hold off;
-
-%Number of dead nodes
-dead=0;
-
-%counter for bit transmitted to Bases Station and to Cluster Heads
-packets_TO_BS=0;
-packets_TO_CH=0;
-%counter for bit transmitted to Bases Station and to Cluster Heads per round
-PACKETS_TO_CH(r+1)=0;
-PACKETS_TO_BS(r+1)=0;
-
-figure(1);
-
-for i=1:1:n
-    %checking if there is a dead node
-     if (S(i).E<=0)
-       dead=dead+1;
-     end
-     
-     if (S(i).E>0)
+for leach_round=1:1:2
+    for i=1:1:n
+        %initially there are no cluster heads only nodes
         S(i).type='N';
-     end
-end
+        S(i).E=Eo;
+        S(i).ENERGY=0;
+    end
+    S(n+1).xd=sink.x;
+    S(n+1).yd=sink.y;
+    if leach_round == 2
+        IS_INITIL_LEACH = true;
+    end
+    %First Iteration
+    figure(1);
 
-if (dead == n)
-   break;
-end
+    %counter for CHs
+    countCHs=0;
+    %counter for CHs per round
+    rcountCHs=0;
+    cluster=1;
 
-STATISTICS(r+1).DEAD=dead;
-DEAD(r+1)=dead;
+    countCHs;
+    rcountCHs=rcountCHs+countCHs;
+    flag_first_dead=0; 
 
-%When the first node dies
-if (dead==1)
-    if(flag_first_dead==0)
-        first_dead=r
-        flag_first_dead=1;
+    for r=0:1:rmax 
+     r
+      % make packetData for 20171101 minute data
+      round_sensing_data = '';
+      if r ~= 0
+          diff_row_val = (sensing_data(r, 1:100)*10) - (sensing_data(r+1, 1:100)*10);
+      end 
+      for i=1:1:100
+         if (IS_INITIL_LEACH )
+            if r == 0
+                % 차분값
+                round_sensing_data = sprintf('%s%d:%d,',round_sensing_data ,(i*10), (sensing_data(r+1, i)*10));
+            else
+              if diff_row_val(i) ~= 0
+                  round_sensing_data = sprintf('%s%d:%d,',round_sensing_data ,(i*10), (diff_row_val(i)));
+
+              end   
+            end
+         else 
+             % 기본 leach의 경우
+            round_sensing_data = sprintf('%s%d:%d,',round_sensing_data ,(i*10), (sensing_data(r+1, i)*10));
+         end
+        % (sensing_data(1, :)*10 ) - (sensing_data(2, :)*10 )
+        % sensing_data([1,2], r:i)*10
+      end
+      % string to 16 bits
+      packetLength = length(dec2bin(round_sensing_data, 16) - '0')*16;
+
+
+      %Operation for epoch
+      if(mod(r, round(1/p))==0)
+         for i=1:1:n
+            S(i).G=0;
+            S(i).cl=0;
+         end
+      end
+
+    hold off;
+
+    %Number of dead nodes
+    dead=0;
+
+    %counter for bit transmitted to Bases Station and to Cluster Heads
+    packets_TO_BS=0;
+    packets_TO_CH=0;
+    %counter for bit transmitted to Bases Station and to Cluster Heads per round
+    PACKETS_TO_CH(r+1)=0;
+    PACKETS_TO_BS(r+1)=0;
+
+    figure(1);
+
+    for i=1:1:n
+        %checking if there is a dead node
+         if (S(i).E<=0)
+           dead=dead+1;
+         end
+
+         if (S(i).E>0)
+            S(i).type='N';
+         end
+    end
+
+    % if (dead == n)
+    if r == 500
+       break;
+    end
+
+    STATISTICS(r+1).DEAD=dead;
+    DEAD(r+1)=dead;
+
+    %When the first node dies
+    if (dead==1)
+        if(flag_first_dead==0)
+            first_dead=r
+            flag_first_dead=1;
+        end
+    end
+
+    countCHs=0;
+    cluster=1;
+    for i=1:1:n
+       if(S(i).E>0)
+         temp_rand=rand;     
+         if ((S(i).G)<=0) 
+            %Election of Cluster Heads
+            if(temp_rand <=(p/(1-p*mod(r,round(1/p)))))
+                countCHs = countCHs+1;
+
+                S(i).type = 'C';
+                S(i).G = round(1/p)-1;
+                C(cluster).xd = S(i).xd;
+                C(cluster).yd = S(i).yd;
+
+                distance=sqrt((S(i).xd-(S(n+1).xd))^2 + (S(i).yd-(S(n+1).yd))^2);%??sink?????
+
+                C(cluster).distance = distance;
+                C(cluster).id = i;
+                X(cluster)=S(i).xd;
+                Y(cluster)=S(i).yd;
+                cluster=cluster+1;
+                % 클러스터 헤드가 방송이 되었습니다.
+                distanceBroad = sqrt(xm*xm+ym*ym);
+                if (distanceBroad >=do)
+                    S(i).E = S(i).E-(ETX*ctrPacketLength + Emp*ctrPacketLength*(distanceBroad*distanceBroad*distanceBroad*distanceBroad));%?????????
+                else
+                    S(i).E = S(i).E-(ETX*ctrPacketLength + Efs*ctrPacketLength*(distanceBroad*distanceBroad)); 
+                end
+                %Calculation of Energy dissipated 클러스터 헤드는 자체 패킷 에너지 소비량을 보냅니다.
+                distance;
+                if(distance>=do)
+                     S(i).E = S(i).E-((ETX+EDA)*packetLength+ Emp*packetLength*(distance*distance*distance*distance ));
+                else
+                     S(i).E = S(i).E-((ETX+EDA)*packetLength+ Efs*packetLength*(distance*distance)); 
+                end
+                packets_TO_BS = packets_TO_BS+1;
+                PACKETS_TO_BS(r+1) = packets_TO_BS;
+            end     
+         end
+       end 
+    end
+
+    STATISTICS(r+1).CLUSTERHEADS = cluster-1;%
+    CLUSTERHS(r+1)= cluster-1;
+
+    %Election of Associated Cluster Head for Normal Nodes
+    for i=1:1:n
+       if (S(i).type=='N' && S(i).E>0) 
+        % min_dis = sqrt( (S(i).xd-S(n+1).xd)^2 + (S(i).yd-S(n+1).yd)^2 );%
+         min_dis = INFINITY; 
+         if(cluster-1>=1)
+             min_dis_cluster = 1;
+
+             for c = 1:1:cluster-1 %
+                %temp = min(min_dis,sqrt( (S(i).xd - C(c).xd)^2 + (S(i).yd - C(c).yd)^2 ) );
+                temp = sqrt((S(i).xd - C(c).xd)^2 + (S(i).yd - C(c).yd)^2);
+                if (temp<min_dis)
+                    min_dis = temp;
+                    min_dis_cluster = c;
+                end
+
+                S(i).E = S(i).E - ETX * ctrPacketLength;
+             end
+
+             %Energy dissipated by associated Cluster Head
+             min_dis;
+             if (min_dis > do)
+                 S(i).E = S(i).E - (ETX*(ctrPacketLength) + Emp * ctrPacketLength*( min_dis * min_dis * min_dis * min_dis)); %
+                 S(i).E = S(i).E - (ETX*(packetLength) + Emp*packetLength*( min_dis * min_dis * min_dis * min_dis)); %
+             else
+                S(i).E = S(i).E -(ETX*(ctrPacketLength) + Efs*ctrPacketLength*( min_dis * min_dis)); %
+                S(i).E = S(i).E -(ETX*(packetLength) + Efs*packetLength*( min_dis * min_dis)); %
+             end
+             S(i).E = S(i).E - ETX*(ctrPacketLength);  %
+
+             %Energy dissipated 
+             if(min_dis > 0)
+                S(C(min_dis_cluster).id).E = S(C(min_dis_cluster).id).E - ((ERX + EDA)*packetLength ); %
+                S(C(min_dis_cluster).id).E = S(C(min_dis_cluster).id).E - ERX *ctrPacketLength ; %
+                if (min_dis > do)%?
+                    S(C(min_dis_cluster).id).E = S(C(min_dis_cluster).id).E - ( ETX*(ctrPacketLength) + Emp * ctrPacketLength*( min_dis * min_dis * min_dis * min_dis));
+                else
+                    S(C(min_dis_cluster).id).E = S(C(min_dis_cluster).id).E - ( ETX*(ctrPacketLength) + Efs * ctrPacketLength*( min_dis * min_dis));
+                end
+               PACKETS_TO_CH(r+1) = n - dead - cluster + 1; 
+             end
+
+             S(i).min_dis = min_dis;
+             S(i).min_dis_cluster = min_dis_cluster;
+
+         end
+      end
+    end
+    %hold on;
+
+    countCHs;
+    rcountCHs = rcountCHs + countCHs;
+    figure(11)
+    warning('OFF');
+    [vx,vy]=voronoi(X(:),Y(:));
+    plot(X,Y,'r+',vx,vy,'m-');
+    hold on;
+    voronoi(X,Y);
+    axis([10 xm 0 ym]);
+
+    end
+
+    x=1:1:r;
+    y=1:1:r;
+    %z=1:1:r;
+
+    for i=1:1:r
+        x(i)=i;
+        y(i) = n - STATISTICS(i).DEAD;
+        %z(i)=CLUSTERHS(i);
+    end
+    if leach_round == 1
+        leach_data = [x;y];
+    else 
+        initil_leach_data = [x;y];
     end
 end
 
-countCHs=0;
-cluster=1;
-for i=1:1:n
-   if(S(i).E>0)
-     temp_rand=rand;     
-     if ((S(i).G)<=0) 
-        %Election of Cluster Heads
-        if(temp_rand <=(p/(1-p*mod(r,round(1/p)))))
-            countCHs = countCHs+1;
-            
-            S(i).type = 'C';
-            S(i).G = round(1/p)-1;
-            C(cluster).xd = S(i).xd;
-            C(cluster).yd = S(i).yd;
-   
-            distance=sqrt((S(i).xd-(S(n+1).xd))^2 + (S(i).yd-(S(n+1).yd))^2);%??sink?????
-            
-            C(cluster).distance = distance;
-            C(cluster).id = i;
-            X(cluster)=S(i).xd;
-            Y(cluster)=S(i).yd;
-            cluster=cluster+1;
-            % 클러스터 헤드가 방송이 되었습니다.
-            distanceBroad = sqrt(xm*xm+ym*ym);
-            if (distanceBroad >=do)
-                S(i).E = S(i).E-(ETX*ctrPacketLength + Emp*ctrPacketLength*(distanceBroad*distanceBroad*distanceBroad*distanceBroad));%?????????
-            else
-                S(i).E = S(i).E-(ETX*ctrPacketLength + Efs*ctrPacketLength*(distanceBroad*distanceBroad)); 
-            end
-            %Calculation of Energy dissipated 클러스터 헤드는 자체 패킷 에너지 소비량을 보냅니다.
-            distance;
-            if(distance>=do)
-                 S(i).E = S(i).E-((ETX+EDA)*packetLength+ Emp*packetLength*(distance*distance*distance*distance ));
-            else
-                 S(i).E = S(i).E-((ETX+EDA)*packetLength+ Efs*packetLength*(distance*distance)); 
-            end
-            packets_TO_BS = packets_TO_BS+1;
-            PACKETS_TO_BS(r+1) = packets_TO_BS;
-        end     
-     end
-   end 
-end
-
-STATISTICS(r+1).CLUSTERHEADS = cluster-1;%
-CLUSTERHS(r+1)= cluster-1;
-
-%Election of Associated Cluster Head for Normal Nodes
-for i=1:1:n
-   if (S(i).type=='N' && S(i).E>0) 
-    % min_dis = sqrt( (S(i).xd-S(n+1).xd)^2 + (S(i).yd-S(n+1).yd)^2 );%
-     min_dis = INFINITY; 
-     if(cluster-1>=1)
-         min_dis_cluster = 1;
-        
-         for c = 1:1:cluster-1 %
-            %temp = min(min_dis,sqrt( (S(i).xd - C(c).xd)^2 + (S(i).yd - C(c).yd)^2 ) );
-            temp = sqrt((S(i).xd - C(c).xd)^2 + (S(i).yd - C(c).yd)^2);
-            if (temp<min_dis)
-                min_dis = temp;
-                min_dis_cluster = c;
-            end
-           
-            S(i).E = S(i).E - ETX * ctrPacketLength;
-         end
-       
-         %Energy dissipated by associated Cluster Head
-         min_dis;
-         if (min_dis > do)
-             S(i).E = S(i).E - (ETX*(ctrPacketLength) + Emp * ctrPacketLength*( min_dis * min_dis * min_dis * min_dis)); %
-             S(i).E = S(i).E - (ETX*(packetLength) + Emp*packetLength*( min_dis * min_dis * min_dis * min_dis)); %
-         else
-            S(i).E = S(i).E -(ETX*(ctrPacketLength) + Efs*ctrPacketLength*( min_dis * min_dis)); %
-            S(i).E = S(i).E -(ETX*(packetLength) + Efs*packetLength*( min_dis * min_dis)); %
-         end
-         S(i).E = S(i).E - ETX*(ctrPacketLength);  %
-             
-         %Energy dissipated 
-         if(min_dis > 0)
-            S(C(min_dis_cluster).id).E = S(C(min_dis_cluster).id).E - ((ERX + EDA)*packetLength ); %
-            S(C(min_dis_cluster).id).E = S(C(min_dis_cluster).id).E - ERX *ctrPacketLength ; %
-            if (min_dis > do)%?
-                S(C(min_dis_cluster).id).E = S(C(min_dis_cluster).id).E - ( ETX*(ctrPacketLength) + Emp * ctrPacketLength*( min_dis * min_dis * min_dis * min_dis));
-            else
-                S(C(min_dis_cluster).id).E = S(C(min_dis_cluster).id).E - ( ETX*(ctrPacketLength) + Efs * ctrPacketLength*( min_dis * min_dis));
-            end
-           PACKETS_TO_CH(r+1) = n - dead - cluster + 1; 
-         end
-       
-         S(i).min_dis = min_dis;
-         S(i).min_dis_cluster = min_dis_cluster;
-     
-     end
-  end
-end
-%hold on;
-
-countCHs;
-rcountCHs = rcountCHs + countCHs;
-figure(11)
-warning('OFF');
-[vx,vy]=voronoi(X(:),Y(:));
-plot(X,Y,'r+',vx,vy,'m-');
-hold on;
-voronoi(X,Y);
-axis([10 xm 0 ym]);
-
-end
-
-x=1:1:r;
-y=1:1:r;
-%z=1:1:r;
-
-for i=1:1:r
-    x(i)=i;
-    y(i) = n - STATISTICS(i).DEAD;
-    %z(i)=CLUSTERHS(i);
-end
 %plot(x,y,'r',x,z,'b');
 
-plot(x,y,'--');
+plot(leach_data(1, [1:500]),leach_data(2, [1:500]),'--', initil_leach_data(1, [1:500]), initil_leach_data(2, [1:500]));
+title('Dead of Round')
+xlabel('Round')
+ylabel('Live Node Count')
+legend('leach', 'I-leach')
 hold on;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%   STATISTICS GRAPH PLOT SIR   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                                                                                     %
