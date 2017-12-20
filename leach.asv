@@ -44,6 +44,10 @@ do=sqrt(Efs/Emp);
 % 초기값 처리 여부
 IS_INITIL_LEACH = false;
 
+%병합 처리 여부
+IS_MERGE = true
+
+cluster_data_count = 20;
 leach_data = [];
 initil_leach_data = [];
 
@@ -83,7 +87,7 @@ for leach_round=1:1:2
     rcountCHs=rcountCHs+countCHs;
     flag_first_dead=0; 
     
-    cluster_data_count = 15;
+    
     
     for r=0:1:rmax 
      r
@@ -98,9 +102,14 @@ for leach_round=1:1:2
                 % 차분값
                 round_sensing_data = sprintf('%s%d:%d,',round_sensing_data ,(i*10), (sensing_data(r+1, i)*10));
             else
-              % if diff_row_val(i) ~= 0
+              if (IS_MERGE)
+                  % 병합처리시 변화 없는 데이터 전송 안함
+                  if diff_row_val(i) ~= 0
+                    round_sensing_data = sprintf('%s%d:%d,',round_sensing_data ,(i*10), (diff_row_val(i)));
+                  end
+              else
                   round_sensing_data = sprintf('%s%d:%d,',round_sensing_data ,(i*10), (diff_row_val(i)));
-              % end   
+              end   
             end
          else 
              % 기본 leach의 경우
@@ -109,9 +118,7 @@ for leach_round=1:1:2
         % (sensing_data(1, :)*10 ) - (sensing_data(2, :)*10 )
         % sensing_data([1,2], r:i)*10
       end
-      % string to 16 bits
-      packetLength = length(dec2bin(round_sensing_data, 16) - '0')*16;
-
+    
 
       %Operation for epoch
       if(mod(r, round(1/p))==0)
@@ -134,20 +141,30 @@ for leach_round=1:1:2
     PACKETS_TO_BS(r+1)=0;
 
     figure(1);
-
+    
+    dead_node_id = '';
+    
     for i=1:1:n
         %checking if there is a dead node
          if (S(i).E<=0)
            dead=dead+1;
+           
          end
 
          if (S(i).E>0)
             S(i).type='N';
          end
     end
+    % 병합 처리시 특수 ID 값 추가 
+    if (IS_INITIL_LEACH )
+       round_sensing_data = sprintf('%s%d:%d,',round_sensing_data ,-1, dead_node_);
+    end
+    % string to 16 bits
+    packetLength = length(dec2bin(round_sensing_data, 16) - '0')*16;
 
+    
     % if (dead == n)
-    if r == 500
+    if r == rmax
        break;
     end
 
@@ -288,11 +305,11 @@ end
 
 %plot(x,y,'r',x,z,'b');
 
-plot(leach_data(1, [1:500]),leach_data(2, [1:500]),'--', initil_leach_data(1, [1:500]), initil_leach_data(2, [1:500]));
+plot(leach_data(1, [1:rmax]),leach_data(2, [1:rmax]),'--', initil_leach_data(1, [1:rmax]), initil_leach_data(2, [1:rmax]));
 title('Dead of Round')
 xlabel('Round')
 ylabel('Live Node Count')
-legend('leach', 'I-leach')
+legend('LEACH', 'I-LEACH')
 hold on;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%   STATISTICS GRAPH PLOT SIR   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                                                                                     %

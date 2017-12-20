@@ -44,8 +44,14 @@ do=sqrt(Efs/Emp);
 % 초기값 처리 여부
 IS_INITIL_LEACH = false;
 
+%병합 처리 여부
+IS_MERGE = true
+
+cluster_data_count = 20;
 leach_data = [];
 initil_leach_data = [];
+dead_node_id = zeros(200);
+
 
 %Creation of the random Sensor Network
 figure(1);
@@ -69,6 +75,7 @@ for leach_round=1:1:2
     S(n+1).yd=sink.y;
     if leach_round == 2
         IS_INITIL_LEACH = true;
+        dead_node_id = zeros(200);
     end
     %First Iteration
     figure(1);
@@ -83,12 +90,14 @@ for leach_round=1:1:2
     rcountCHs=rcountCHs+countCHs;
     flag_first_dead=0; 
     
-    cluster_data_count = 15;
+    
     
     for r=0:1:rmax 
-     r
+     %r
       % make packetData for 20171101 minute data
       round_sensing_data = '';
+      round_data = zeros(cluster_data_count);
+      
       if r ~= 0
           diff_row_val = (sensing_data(r, 1:cluster_data_count)*10) - (sensing_data(r+1, 1:cluster_data_count)*10);
       end 
@@ -98,9 +107,15 @@ for leach_round=1:1:2
                 % 차분값
                 round_sensing_data = sprintf('%s%d:%d,',round_sensing_data ,(i*10), (sensing_data(r+1, i)*10));
             else
-              % if diff_row_val(i) ~= 0
+              if (IS_MERGE)
+                  % 병합처리시 변화 없는 데이터 전송 안함
+                  if diff_row_val(i) ~= 0
+                    % round_sensing_data = sprintf('%s%d:%d,',round_sensing_data ,(i*10), (diff_row_val(i)));
+                    round_data(i) = diff_row_val(i);
+                  end
+              else
                   round_sensing_data = sprintf('%s%d:%d,',round_sensing_data ,(i*10), (diff_row_val(i)));
-              % end   
+              end   
             end
          else 
              % 기본 leach의 경우
@@ -109,9 +124,7 @@ for leach_round=1:1:2
         % (sensing_data(1, :)*10 ) - (sensing_data(2, :)*10 )
         % sensing_data([1,2], r:i)*10
       end
-      % string to 16 bits
-      packetLength = length(dec2bin(round_sensing_data, 16) - '0')*16;
-
+    
 
       %Operation for epoch
       if(mod(r, round(1/p))==0)
@@ -134,20 +147,50 @@ for leach_round=1:1:2
     PACKETS_TO_BS(r+1)=0;
 
     figure(1);
-
+    
+    
     for i=1:1:n
         %checking if there is a dead node
          if (S(i).E<=0)
            dead=dead+1;
+           dead_node_id(i) =  dead_node_id(i)+1;
          end
 
          if (S(i).E>0)
             S(i).type='N';
          end
     end
+    % 병합 처리시 죽은 노드의 특수 ID 값 추가 
+    if (IS_MERGE )
+       round_dead_node_id = '';
+       this_round_dead_node_id = dead_node_id == 1;
+       for i=1:1:n
+           if this_round_dead_node_id(i) == 1
+               round_dead_node_id = sprintf('%s|%d', round_dead_node_id, i);
+           end
+       end
+       % 죽은 노드 ID 저장
+       round_sensing_data = sprintf('%s%d:%d,',round_sensing_data ,-1, round_dead_node_id);
+       % 데이터 병합값 생성
+       round_data_min = min(round_data);
+       round_data_min_idx = find(round_data==min(round_data))
+       % 기준값으로 차분값 처리
+       round_data = round_data-round_data_min;
+       % 해야함!!!!!!!!!!
+       % 병합처리
+       for i=1:1:cluster_data_count
+           round_data(i)
+       end
+       % 해야함 !!!!!
+       % round_sensing_data = sprintf('%s%d:%d,',round_sensing_data ,(i*10), (diff_row_val(i)));
+       
+    end
+    % string to 16 bits
+    packetLength = length(dec2bin(round_sensing_data, 16) - '0')*16;
 
+    
     % if (dead == n)
-    if r == 1000
+    if r == rmax
        break;
     end
 
@@ -288,11 +331,11 @@ end
 
 %plot(x,y,'r',x,z,'b');
 
-plot(leach_data(1, [1:500]),leach_data(2, [1:500]),'--', initil_leach_data(1, [1:500]), initil_leach_data(2, [1:500]));
+plot(leach_data(1, [1:rmax]),leach_data(2, [1:rmax]),'--', initil_leach_data(1, [1:rmax]), initil_leach_data(2, [1:rmax]));
 title('Dead of Round')
 xlabel('Round')
 ylabel('Live Node Count')
-legend('leach', 'I-leach')
+legend('LEACH', 'I-LEACH')
 hold on;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%   STATISTICS GRAPH PLOT SIR   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                                                                                     %
