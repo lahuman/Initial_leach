@@ -147,7 +147,7 @@ for leach_round=1:1:2
     end
 
     % if (dead == n)
-    if r == 1000
+    if r == 500
        break;
     end
 
