@@ -50,7 +50,7 @@ IS_MERGE = true
 cluster_data_count = 20;
 leach_data = [];
 initil_leach_data = [];
-dead_node_id = zeros(200);
+dead_node_id = zeros(1, n);
 
 
 %Creation of the random Sensor Network
@@ -75,7 +75,7 @@ for leach_round=1:1:2
     S(n+1).yd=sink.y;
     if leach_round == 2
         IS_INITIL_LEACH = true;
-        dead_node_id = zeros(200);
+        dead_node_id = zeros(1, n);
     end
     %First Iteration
     figure(1);
@@ -93,10 +93,10 @@ for leach_round=1:1:2
     
     
     for r=0:1:rmax 
-     %r
+     r
       % make packetData for 20171101 minute data
       round_sensing_data = '';
-      round_data = zeros(cluster_data_count);
+      round_data = zeros(1, cluster_data_count);
       
       if r ~= 0
           diff_row_val = (sensing_data(r, 1:cluster_data_count)*10) - (sensing_data(r+1, 1:cluster_data_count)*10);
@@ -161,7 +161,7 @@ for leach_round=1:1:2
          end
     end
     % 병합 처리시 죽은 노드의 특수 ID 값 추가 
-    if (IS_MERGE )
+    if ( r ~= 0 && IS_INITIL_LEACH && IS_MERGE )
        round_dead_node_id = '';
        this_round_dead_node_id = dead_node_id == 1;
        for i=1:1:n
@@ -170,18 +170,28 @@ for leach_round=1:1:2
            end
        end
        % 죽은 노드 ID 저장
-       round_sensing_data = sprintf('%s%d:%d,',round_sensing_data ,-1, round_dead_node_id);
+       if ~strcmp(round_dead_node_id, '')
+        round_sensing_data = sprintf('%s%d:%d,',round_sensing_data ,-1, round_dead_node_id);
+       end
        % 데이터 병합값 생성
+       % 기준 값
        round_data_min = min(round_data);
-       round_data_min_idx = find(round_data==min(round_data))
        % 기준값으로 차분값 처리
        round_data = round_data-round_data_min;
-       % 해야함!!!!!!!!!!
+       round_data_unique = unique(round_data);
+       
        % 병합처리
-       for i=1:1:cluster_data_count
-           round_data(i)
+       % strrep(strtrim(cellstr(num2str(A))), '  ', '|')
+       for i=1:1:length(round_data_unique)
+           ids_val =  char(regexprep(strtrim(cellstr(num2str(find(round_data==round_data_unique(i))))), '\s+', '|'));
+           
+           if round_data_unique(i) == 0
+               round_sensing_data = sprintf('%s0|%s:%d,',round_sensing_data, ids_val, round_data_unique(i))
+           else
+               round_sensing_data = sprintf('%s%s:%d,',round_sensing_data, ids_val, round_data_unique(i))
+           end
        end
-       % 해야함 !!!!!
+       round_sensing_data
        % round_sensing_data = sprintf('%s%d:%d,',round_sensing_data ,(i*10), (diff_row_val(i)));
        
     end
