@@ -50,6 +50,8 @@ IS_MERGE = true
 cluster_data_count = 20;
 leach_data = [];
 initil_leach_data = [];
+leach_data_length = zeros(1, rmax);
+initil_data_length = zeros(1, rmax);
 dead_node_id = zeros(1, n);
 
 
@@ -197,7 +199,13 @@ for leach_round=1:1:2
     end
     % string to 16 bits
     packetLength = length(dec2bin(round_sensing_data, 16) - '0')*16;
-
+    
+    
+    if leach_round == 1
+        leach_data_length((r+1)) = packetLength;
+    else
+        initil_data_length((r+1)) = packetLength;
+    end 
     
     % if (dead == n)
     if r == rmax
@@ -321,6 +329,7 @@ for leach_round=1:1:2
     voronoi(X,Y);
     axis([10 xm 0 ym]);
 
+
     end
 
     x=1:1:r;
@@ -345,8 +354,12 @@ plot(leach_data(1, [1:rmax]),leach_data(2, [1:rmax]),'--', initil_leach_data(1, 
 title('Dead of Round')
 xlabel('Round')
 ylabel('Live Node Count')
-legend('LEACH', 'I-LEACH')
+legend('LEACH', 'Proposal')
 hold on;
+
+fix(mean(leach_data_length))
+
+fix(mean(initil_data_length))
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%   STATISTICS GRAPH PLOT SIR   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                                                                                     %
 %  DEAD  : a rmax x 1 array of number of dead nodes/round 
