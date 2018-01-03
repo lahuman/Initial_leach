@@ -21,6 +21,7 @@ n = 200;
 p=0.05;
 packetLength =6400;
 ctrPacketLength = 200;
+sensingDataLength = 300;
 %Energy Model (all values in Joules)
 %Initial Energy 
 Eo = 0.5;
@@ -298,9 +299,9 @@ for leach_round=1:1:2
             else
                 nodeData = sprintf('%d:%d,', i, (sensing_data(r+1, i)*10));
             end
-            nodeData
+
             nodePacketLength = length(dec2bin(nodeData, 16) - '0')*16;
-             
+            
              %Energy dissipated by associated Cluster Head
              min_dis;
              if (min_dis > do)
@@ -314,7 +315,7 @@ for leach_round=1:1:2
 
              %Energy dissipated 
              if(min_dis > 0)
-                S(C(min_dis_cluster).id).E = S(C(min_dis_cluster).id).E - ((ERX + EDA)*1000 ); % sensing energy
+                S(C(min_dis_cluster).id).E = S(C(min_dis_cluster).id).E - ((ERX + EDA)*sensingDataLength ); % sensing energy
                 S(C(min_dis_cluster).id).E = S(C(min_dis_cluster).id).E - ERX *ctrPacketLength ; %
                 if (min_dis > do)%?
                     S(C(min_dis_cluster).id).E = S(C(min_dis_cluster).id).E - ( ETX*(ctrPacketLength) + Emp * ctrPacketLength*( min_dis * min_dis * min_dis * min_dis));
