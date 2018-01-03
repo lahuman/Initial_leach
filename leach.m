@@ -45,7 +45,7 @@ do=sqrt(Efs/Emp);
 IS_INITIL_LEACH = false;
 
 %병합 처리 여부
-IS_MERGE = true
+IS_MERGE = true;
 
 cluster_data_count = 20;
 leach_data = [];
@@ -288,20 +288,33 @@ for leach_round=1:1:2
                 S(i).E = S(i).E - ETX * ctrPacketLength;
              end
 
+             % Node data
+            if (IS_INITIL_LEACH )
+                if r == 0
+                    nodeData = sprintf('%d:%d,', i, (sensing_data(r+1, i)*10));
+                else
+                    nodeData = sprintf('%d:%d,', i, ((sensing_data(r+1, i)*10)-(sensing_data(r, i)*10)));
+                end
+            else
+                nodeData = sprintf('%d:%d,', i, (sensing_data(r+1, i)*10));
+            end
+            nodeData
+            nodePacketLength = length(dec2bin(nodeData, 16) - '0')*16;
+             
              %Energy dissipated by associated Cluster Head
              min_dis;
              if (min_dis > do)
                  S(i).E = S(i).E - (ETX*(ctrPacketLength) + Emp * ctrPacketLength*( min_dis * min_dis * min_dis * min_dis)); %
-                 S(i).E = S(i).E - (ETX*(packetLength) + Emp*packetLength*( min_dis * min_dis * min_dis * min_dis)); %
+                 S(i).E = S(i).E - (ETX*(nodePacketLength) + Emp*nodePacketLength*( min_dis * min_dis * min_dis * min_dis)); %
              else
                 S(i).E = S(i).E -(ETX*(ctrPacketLength) + Efs*ctrPacketLength*( min_dis * min_dis)); %
-                S(i).E = S(i).E -(ETX*(packetLength) + Efs*packetLength*( min_dis * min_dis)); %
+                S(i).E = S(i).E -(ETX*(nodePacketLength) + Efs*nodePacketLength*( min_dis * min_dis)); %
              end
              S(i).E = S(i).E - ETX*(ctrPacketLength);  %
 
              %Energy dissipated 
              if(min_dis > 0)
-                S(C(min_dis_cluster).id).E = S(C(min_dis_cluster).id).E - ((ERX + EDA)*packetLength ); %
+                S(C(min_dis_cluster).id).E = S(C(min_dis_cluster).id).E - ((ERX + EDA)*1000 ); % sensing energy
                 S(C(min_dis_cluster).id).E = S(C(min_dis_cluster).id).E - ERX *ctrPacketLength ; %
                 if (min_dis > do)%?
                     S(C(min_dis_cluster).id).E = S(C(min_dis_cluster).id).E - ( ETX*(ctrPacketLength) + Emp * ctrPacketLength*( min_dis * min_dis * min_dis * min_dis));
