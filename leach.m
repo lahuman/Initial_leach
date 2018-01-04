@@ -21,7 +21,6 @@ n = 200;
 p=0.05;
 packetLength =6400;
 ctrPacketLength = 200;
-sensingDataLength = 300;
 %Energy Model (all values in Joules)
 %Initial Energy 
 Eo = 0.5;
@@ -46,7 +45,7 @@ do=sqrt(Efs/Emp);
 IS_INITIL_LEACH = false;
 
 %병합 처리 여부
-IS_MERGE = true;
+IS_MERGE = false;
 
 cluster_data_count = 20;
 leach_data = [];
@@ -292,12 +291,12 @@ for leach_round=1:1:2
              % Node data
             if (IS_INITIL_LEACH )
                 if r == 0
-                    nodeData = sprintf('%d:%d,', i, (sensing_data(r+1, i)*10));
+                    nodeData = sprintf('%d:%d', i, (sensing_data(r+1, i)*10));
                 else
-                    nodeData = sprintf('%d:%d,', i, ((sensing_data(r+1, i)*10)-(sensing_data(r, i)*10)));
+                    nodeData = sprintf('%d:%d', i, ((sensing_data(r+1, i)*10)-(sensing_data(r, i)*10)));
                 end
             else
-                nodeData = sprintf('%d:%d,', i, (sensing_data(r+1, i)*10));
+                nodeData = sprintf('%d:%d', i, (sensing_data(r+1, i)*10));
             end
 
             nodePacketLength = length(dec2bin(nodeData, 16) - '0')*16;
@@ -315,7 +314,7 @@ for leach_round=1:1:2
 
              %Energy dissipated 
              if(min_dis > 0)
-                S(C(min_dis_cluster).id).E = S(C(min_dis_cluster).id).E - ((ERX + EDA)*sensingDataLength ); % sensing energy
+                S(C(min_dis_cluster).id).E = S(C(min_dis_cluster).id).E - ((ERX + EDA)*nodePacketLength ); % sensing energy
                 S(C(min_dis_cluster).id).E = S(C(min_dis_cluster).id).E - ERX *ctrPacketLength ; %
                 if (min_dis > do)%?
                     S(C(min_dis_cluster).id).E = S(C(min_dis_cluster).id).E - ( ETX*(ctrPacketLength) + Emp * ctrPacketLength*( min_dis * min_dis * min_dis * min_dis));
