@@ -3,7 +3,7 @@
 clear;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% PARAMETERS %%%%%%%%%%%%%%%%%%%%%%%%%%%%
-sensing_data = csvread('day_data.csv')
+sensing_data = csvread('day_data.csv');
 %Field Dimensions - x and y maximum (in meters)
 xm = 300;
 ym = 300;
@@ -45,13 +45,14 @@ do=sqrt(Efs/Emp);
 IS_INITIL_LEACH = false;
 
 %병합 처리 여부
-IS_MERGE = false;
+IS_MERGE = true;
 
 cluster_data_count = 20;
 leach_data = [];
 initil_leach_data = [];
 leach_data_length = zeros(1, rmax);
 initil_data_length = zeros(1, rmax);
+lzw_data_length = zeros(1, rmax);
 dead_node_id = zeros(1, n);
 
 
@@ -66,7 +67,7 @@ for i=1:1:n
     % hold on;
 end
 
-for leach_round=1:1:2
+for leach_round=1:1:3
     for i=1:1:n
         %initially there are no cluster heads only nodes
         S(i).type='N';
@@ -75,7 +76,7 @@ for leach_round=1:1:2
     end
     S(n+1).xd=sink.x;
     S(n+1).yd=sink.y;
-    if leach_round == 2
+    if leach_round == 3
         IS_INITIL_LEACH = true;
         dead_node_id = zeros(1, n);
     end
@@ -95,7 +96,7 @@ for leach_round=1:1:2
     
     
     for r=0:1:rmax 
-     r
+     % r
       % make packetData for 20171101 minute data
       round_sensing_data = '';
       round_data = zeros(1, cluster_data_count);
@@ -107,7 +108,7 @@ for leach_round=1:1:2
          if (IS_INITIL_LEACH )
             if r == 0
                 % 차분값
-                round_sensing_data = sprintf('%s%d:%d,',round_sensing_data ,(i*10), (sensing_data(r+1, i)*10));
+                round_sensing_data = sprintf('%s%d:%d,',round_sensing_data ,(i), (sensing_data(r+1, i)*10));
             else
               if (IS_MERGE)
                   % 병합처리시 변화 없는 데이터 전송 안함
@@ -116,12 +117,12 @@ for leach_round=1:1:2
                     round_data(i) = diff_row_val(i);
                   end
               else
-                  round_sensing_data = sprintf('%s%d:%d,',round_sensing_data ,(i*10), (diff_row_val(i)));
+                  round_sensing_data = sprintf('%s%d:%d,',round_sensing_data ,(i), (diff_row_val(i)));
               end   
             end
          else 
              % 기본 leach의 경우
-            round_sensing_data = sprintf('%s%d:%d,',round_sensing_data ,(i*10), (sensing_data(r+1, i)*10));
+            round_sensing_data = sprintf('%s%d:%d,',round_sensing_data ,(i), (sensing_data(r+1, i)*10));
          end
         % (sensing_data(1, :)*10 ) - (sensing_data(2, :)*10 )
         % sensing_data([1,2], r:i)*10
@@ -188,26 +189,38 @@ for leach_round=1:1:2
            ids_val =  char(regexprep(strtrim(cellstr(num2str(find(round_data==round_data_unique(i))))), '\s+', '|'));
            
            if round_data_unique(i) == 0
-               round_sensing_data = sprintf('%s0|%s:%d,',round_sensing_data, ids_val, round_data_unique(i))
+               round_sensing_data = sprintf('%s0|%s:%d,',round_sensing_data, ids_val, round_data_unique(i));
            else
-               round_sensing_data = sprintf('%s%s:%d,',round_sensing_data, ids_val, round_data_unique(i))
+               round_sensing_data = sprintf('%s%s:%d,',round_sensing_data, ids_val, round_data_unique(i));
            end
        end
-       round_sensing_data
+       round_sensing_data;
        % round_sensing_data = sprintf('%s%d:%d,',round_sensing_data ,(i*10), (diff_row_val(i)));
        
     end
+    
+    round_sensing_data
+    % length(dec2bin(round_sensing_data, 16) - '0')
     % string to 16 bits
-    packetLength = length(dec2bin(round_sensing_data, 16) - '0')*16;
     
+    % packetLength = length(dec2bin(round_sensing_data, 16) - '0')*16;
+    packetLength = length(dec2bin(round_sensing_data) - '0')*16;
+    if leach_round == 2
+        packetLength = compressionLZW(round_sensing_data)*16;
+    end
+    packetLength
     
-    if leach_round == 1
+    if leach_round == 1 
         leach_data_length((r+1)) = packetLength;
+    elseif leach_round == 2
+        lzw_data_length((r+1)) = packetLength;
     else
         initil_data_length((r+1)) = packetLength;
     end 
     
-    % if (dead == n)
+    %if (dead == n)
+    %    r
+    %end
     if r == rmax
        break;
     end
@@ -218,7 +231,7 @@ for leach_round=1:1:2
     %When the first node dies
     if (dead==1)
         if(flag_first_dead==0)
-            first_dead=r
+            first_dead=r;
             flag_first_dead=1;
         end
     end
@@ -356,23 +369,24 @@ for leach_round=1:1:2
     end
     if leach_round == 1
         leach_data = [x;y];
-    else 
+    elseif  leach_round == 2
+        lzw_data = [x;y];
+    else
         initil_leach_data = [x;y];
     end
 end
 
 %plot(x,y,'r',x,z,'b');
 
-plot(leach_data(1, [1:rmax]),leach_data(2, [1:rmax]),'--', initil_leach_data(1, [1:rmax]), initil_leach_data(2, [1:rmax]));
-title('Dead of Round')
-xlabel('Round')
-ylabel('Live Node Count')
-legend('LEACH', 'Proposal')
+plot(leach_data(1, [1:rmax]),leach_data(2, [1:rmax]),'g--', lzw_data(1, [1:rmax]), lzw_data(2, [1:rmax]), 'b:', initil_leach_data(1, [1:rmax]), initil_leach_data(2, [1:rmax]), 'r-');
+xlabel('Round');
+ylabel('Live Node Count');
+legend('LEACH', 'LZW','Proposal');
 hold on;
 
-fix(mean(leach_data_length))
+fix(mean(leach_data_length));
 
-fix(mean(initil_data_length))
+fix(mean(initil_data_length));
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%   STATISTICS GRAPH PLOT SIR   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                                                                                     %
 %  DEAD  : a rmax x 1 array of number of dead nodes/round 
