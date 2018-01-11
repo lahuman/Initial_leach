@@ -12,6 +12,7 @@ options.Resize='on'; % Makes the prompt window resizable.
 options.WindowStyle='normal'; % Makes the prompt window "normal" instead of being "modal".
 originalText = inputdlg(input, dlg_title, num_lines, defaultoriginalText,options); % Displays the prompt window with assigned features.
 originalText = cell2mat(originalText); % Makes the "originalText" a char class variable from cell class.
+
 if isempty(originalText) % Nothing happens if the user clicks "Cancel" or clicks "Ok" while the text field is empty.
 	return;
 end
@@ -50,7 +51,10 @@ for i=1:length(originalText)
     else
         k = k+1;
         output(k) = P_code;
+        initialDictionary
+        length(initialDictionary)
         length(initialDictionary) = length(initialDictionary) + 1;
+        length(initialDictionary)
         Dictionary(length(initialDictionary)) = {Q};
         P = originalText(i);
         P_code = strfind(initialDictionary, P);
@@ -62,6 +66,7 @@ display(output);
 
 
 [m, n]=  size(dec2bin((sprintf('%d', output).'), 16)-'0');
+m
 % packetLength = length(dec2bin(str2num(sprintf('%d', output).'), 16) - '0') * 16
 
 
