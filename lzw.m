@@ -65,7 +65,7 @@ output(k) = P_code;
 display(output);
 
 
-[m, n]=  size(dec2bin((sprintf('%d', output).'), 16)-'0');
+[m, n]=  size(dec2bin((sprintf('%s', output).'), 16)-'0');
 m
 % packetLength = length(dec2bin(str2num(sprintf('%d', output).'), 16) - '0') * 16
 

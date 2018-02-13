@@ -45,7 +45,7 @@ do=sqrt(Efs/Emp);
 IS_INITIL_LEACH = false;
 
 %병합 처리 여부
-IS_MERGE = true;
+IS_MERGE = false;
 
 cluster_data_count = 20;
 leach_data = [];
@@ -199,16 +199,20 @@ for leach_round=1:1:3
        
     end
     
-    round_sensing_data
+    
     % length(dec2bin(round_sensing_data, 16) - '0')
     % string to 16 bits
     
     % packetLength = length(dec2bin(round_sensing_data, 16) - '0')*16;
     packetLength = length(dec2bin(round_sensing_data) - '0')*16;
-    if leach_round == 2
+    if IS_MERGE && leach_round == 2
         packetLength = compressionLZW(round_sensing_data)*16;
     end
-    packetLength
+    % 0~20 까지 데이터 출력용
+    if r < 20
+        fprintf('round :%d\n', leach_round); 
+        fprintf('packetLen:%d, data: %s\n',packetLength, round_sensing_data); 
+    end
     
     if leach_round == 1 
         leach_data_length((r+1)) = packetLength;
@@ -378,15 +382,15 @@ end
 
 %plot(x,y,'r',x,z,'b');
 
-plot(leach_data(1, [1:rmax]),leach_data(2, [1:rmax]),'g--', lzw_data(1, [1:rmax]), lzw_data(2, [1:rmax]), 'b-.', initil_leach_data(1, [1:rmax]), initil_leach_data(2, [1:rmax]), 'r-');
+plot(lzw_data(1, [1:rmax]), lzw_data(2, [1:rmax]), '--', initil_leach_data(1, [1:rmax]), initil_leach_data(2, [1:rmax]), 'r-');
 xlabel('Round');
 ylabel('Live Node Count');
-legend('LEACH', 'LZW','Proposal');
+legend('LEACH','Proposal');
 hold on;
 
-fix(mean(leach_data_length));
-
-fix(mean(initil_data_length));
+% fix(mean(leach_data_length))
+fix(mean(lzw_data_length))
+fix(mean(initil_data_length))
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%   STATISTICS GRAPH PLOT SIR   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                                                                                     %
 %  DEAD  : a rmax x 1 array of number of dead nodes/round 

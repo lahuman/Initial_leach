@@ -4,11 +4,11 @@ originalText = [dataIn]; % Makes the "originalText" a char class variable from c
 
 %originalText = cell2mat(originalText);
 initialDictionary = unique(originalText); % Chooses the unique characters of the input text.
-fprintf('Original Text:%s\n', originalText); % Displays the original text.
-fprintf('Initial Dictionary:%s\n', initialDictionary); % Displays the initial dictionary.
+% fprintf('Original Text:%s\n', originalText); % Displays the original text.
+% fprintf('Initial Dictionary:%s\n', initialDictionary); % Displays the initial dictionary.
 for c = 1 : length(initialDictionary) % This loop counts the number of iterations of each unique character of the input text.
 	countForThisChar = sum(originalText == initialDictionary(c));
-	fprintf(2,'Number of iterations of character %s : %d\n', initialDictionary(c), countForThisChar); % Displays number of iteratios in red color.
+	% fprintf(2,'Number of iterations of character %s : %d\n', initialDictionary(c), countForThisChar); % Displays number of iteratios in red color.
 end
 
 
@@ -45,9 +45,9 @@ for i=1:length(originalText)
 end
 k = k+1;
 output(k) = P_code;
-display(output);
+% display(output);
 
-[packLen, n]=  size(dec2bin((sprintf('%s', output).'))-'0');
+[packLen, n]=  size(dec2bin((sprintf('%d', output).'))-'0');
 % str_x = num2str(output);
 % str_x(isspace(str_x)) = ''
 
