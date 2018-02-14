@@ -45,7 +45,7 @@ do=sqrt(Efs/Emp);
 IS_INITIL_LEACH = false;
 
 %병합 처리 여부
-IS_MERGE = false;
+IS_MERGE = true;
 
 cluster_data_count = 20;
 leach_data = [];
@@ -102,7 +102,7 @@ for leach_round=1:1:3
       round_data = zeros(1, cluster_data_count);
       
       if r ~= 0
-          diff_row_val = (sensing_data(r, 1:cluster_data_count)*10) - (sensing_data(r+1, 1:cluster_data_count)*10);
+          diff_row_val = (sensing_data(r+1, 1:cluster_data_count)*10)-(sensing_data(r, 1:cluster_data_count)*10);
       end 
       for i=1:1:cluster_data_count
          if (IS_INITIL_LEACH )
