@@ -189,7 +189,7 @@ for leach_round=1:1:3
            ids_val =  char(regexprep(strtrim(cellstr(num2str(find(round_data==round_data_unique(i))))), '\s+', '|'));
            
            if round_data_unique(i) == 0
-               round_sensing_data = sprintf('%s0|%s:%d,',round_sensing_data, ids_val, round_data_unique(i));
+               round_sensing_data = sprintf('%s0|%s:%d,',round_sensing_data, ids_val, round_data_min);
            else
                round_sensing_data = sprintf('%s%s:%d,',round_sensing_data, ids_val, round_data_unique(i));
            end
