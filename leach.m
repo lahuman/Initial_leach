@@ -112,10 +112,10 @@ for leach_round=1:1:3
             else
               if (IS_MERGE)
                   % 병합처리시 변화 없는 데이터 전송 안함
-                  if diff_row_val(i) ~= 0
+                  % if diff_row_val(i) ~= 0
                     % round_sensing_data = sprintf('%s%d:%d,',round_sensing_data ,(i*10), (diff_row_val(i)));
                     round_data(i) = diff_row_val(i);
-                  end
+                  % end
               else
                   round_sensing_data = sprintf('%s%d:%d,',round_sensing_data ,(i), (diff_row_val(i)));
               end   
@@ -191,7 +191,11 @@ for leach_round=1:1:3
            if round_data_unique(i) == 0
                round_sensing_data = sprintf('%s0|%s:%d,',round_sensing_data, ids_val, round_data_min);
            else
-               round_sensing_data = sprintf('%s%s:%d,',round_sensing_data, ids_val, round_data_unique(i));
+              
+               if (round_data_unique(i) - abs(round_data_min)) ~= 0
+                round_sensing_data = sprintf('%s%s:%d,',round_sensing_data, ids_val, round_data_unique(i));
+               end
+
            end
        end
        round_sensing_data;
