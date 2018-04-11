@@ -45,7 +45,7 @@ do=sqrt(Efs/Emp);
 IS_INITIL_LEACH = false;
 
 %병합 처리 여부
-IS_MERGE = false;
+IS_MERGE = true;
 
 cluster_data_count = 20;
 leach_data = [];
@@ -388,7 +388,7 @@ end
 
 plot(lzw_data(1, [1:rmax]), lzw_data(2, [1:rmax]), '--', initil_leach_data(1, [1:rmax]), initil_leach_data(2, [1:rmax]), 'r-');
 xlabel('Round');
-ylabel('Live Node Count');
+ylabel('Number of Live Node');
 legend('LEACH','Proposal');
 hold on;
 
