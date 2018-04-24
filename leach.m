@@ -21,6 +21,7 @@ n = 200;
 p=0.05;
 packetLength =6400;
 ctrPacketLength = 200;
+diffPacketLength = 20; % 차분 패킷
 %Energy Model (all values in Joules)
 %Initial Energy 
 Eo = 0.5;
@@ -332,6 +333,9 @@ for leach_round=1:1:3
                 S(i).E = S(i).E -(ETX*(nodePacketLength) + Efs*nodePacketLength*( min_dis * min_dis)); %
              end
              S(i).E = S(i).E - ETX*(ctrPacketLength);  %
+             if ( r ~= 0 && IS_INITIL_LEACH && IS_MERGE )
+                 S(i).E = S(i).E-((ETX+EDA)*diffPacketLength); % 차분 처리 에너지 소비
+             end
 
              %Energy dissipated 
              if(min_dis > 0)
