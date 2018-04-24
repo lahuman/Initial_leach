@@ -21,7 +21,7 @@ n = 200;
 p=0.05;
 packetLength =6400;
 ctrPacketLength = 200;
-diffPacketLength = 20; % 차분 패킷
+diffPacketLength = 50; % 차분 패킷
 %Energy Model (all values in Joules)
 %Initial Energy 
 Eo = 0.5;
@@ -46,7 +46,7 @@ do=sqrt(Efs/Emp);
 IS_INITIL_LEACH = false;
 
 %병합 처리 여부
-IS_MERGE = true;
+IS_MERGE = false;
 
 cluster_data_count = 20;
 leach_data = [];
