@@ -21,6 +21,7 @@ n = 200;
 p=0.05;
 packetLength =6400;
 ctrPacketLength = 200;
+diffPacketLength = 50; % 차분 패킷
 %Energy Model (all values in Joules)
 %Initial Energy 
 Eo = 0.5;
@@ -45,7 +46,7 @@ do=sqrt(Efs/Emp);
 IS_INITIL_LEACH = false;
 
 %병합 처리 여부
-IS_MERGE = true;
+IS_MERGE = false;
 
 cluster_data_count = 20;
 leach_data = [];
@@ -67,7 +68,7 @@ for i=1:1:n
     % hold on;
 end
 
-for leach_round=1:1:3
+for leach_round=2:1:3
     for i=1:1:n
         %initially there are no cluster heads only nodes
         S(i).type='N';
@@ -99,6 +100,7 @@ for leach_round=1:1:3
      % r
       % make packetData for 20171101 minute data
       round_sensing_data = '';
+      unzip_round_sensing_data = '';
       round_data = zeros(1, cluster_data_count);
       
       if r ~= 0
@@ -127,7 +129,8 @@ for leach_round=1:1:3
         % (sensing_data(1, :)*10 ) - (sensing_data(2, :)*10 )
         % sensing_data([1,2], r:i)*10
       end
-    
+      unzip_round_sensing_data = round_sensing_data;
+      
 
       %Operation for epoch
       if(mod(r, round(1/p))==0)
@@ -191,15 +194,14 @@ for leach_round=1:1:3
            if round_data_unique(i) == 0
                round_sensing_data = sprintf('%s0|%s:%d,',round_sensing_data, ids_val, round_data_min);
            else
-               
-               if i < 2
-                round_data_unique(i) - round_data_min
+              
+               if (round_data_unique(i) - abs(round_data_min)) ~= 0
+                round_sensing_data = sprintf('%s%s:%d,',round_sensing_data, ids_val, round_data_unique(i));
                end
-               round_sensing_data = sprintf('%s%s:%d,',round_sensing_data, ids_val, round_data_unique(i));
 
            end
        end
-       round_sensing_data
+       round_sensing_data;
        % round_sensing_data = sprintf('%s%d:%d,',round_sensing_data ,(i*10), (diff_row_val(i)));
        
     end
@@ -276,11 +278,18 @@ for leach_round=1:1:3
                 end
                 %Calculation of Energy dissipated 클러스터 헤드는 자체 패킷 에너지 소비량을 보냅니다.
                 distance;
+                % 병합 에너지 처리 제외
                 if(distance>=do)
+                     % S(i).E = S(i).E-((ETX+EDA)*packetLength+ Emp*packetLength*(distance*distance*distance*distance ));
                      S(i).E = S(i).E-((ETX+EDA)*packetLength+ Emp*packetLength*(distance*distance*distance*distance ));
                 else
+                     % S(i).E = S(i).E-((ETX+EDA)*packetLength+ Efs*packetLength*(distance*distance)); 
                      S(i).E = S(i).E-((ETX+EDA)*packetLength+ Efs*packetLength*(distance*distance)); 
                 end
+                % 병합 에너지 처리
+                
+                length(dec2bin(round_sensing_data) - '0')*16
+                
                 packets_TO_BS = packets_TO_BS+1;
                 PACKETS_TO_BS(r+1) = packets_TO_BS;
             end     
@@ -333,6 +342,9 @@ for leach_round=1:1:3
                 S(i).E = S(i).E -(ETX*(nodePacketLength) + Efs*nodePacketLength*( min_dis * min_dis)); %
              end
              S(i).E = S(i).E - ETX*(ctrPacketLength);  %
+             if ( r ~= 0 && IS_INITIL_LEACH && IS_MERGE )
+                 S(i).E = S(i).E-(EDA)*diffPacketLength); % 차분 처리 에너지 소비
+             end
 
              %Energy dissipated 
              if(min_dis > 0)
@@ -389,7 +401,7 @@ end
 
 plot(lzw_data(1, [1:rmax]), lzw_data(2, [1:rmax]), '--', initil_leach_data(1, [1:rmax]), initil_leach_data(2, [1:rmax]), 'r-');
 xlabel('Round');
-ylabel('Live Node Count');
+ylabel('Number of Live Node');
 legend('LEACH','Proposal');
 hold on;
 
