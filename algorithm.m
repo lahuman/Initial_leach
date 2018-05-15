@@ -13,7 +13,7 @@ cluster_data_count=20;
 vals = (sensing_data(r+1, 1:cluster_data_count)*10)-(sensing_data(r, 1:cluster_data_count)*10);
 ids = 1:20;
 
-function [map] = compressionLZW (ids, vals)
+function [map] = compressionAlgorithm (ids, vals)
 
 for i=1:1:cluster_data_count
     if vals(i) ~= 0
@@ -31,10 +31,8 @@ for i=1:1:cluster_data_count
 end
 
 keySet = map.keys;
-for i=1:1:length(map)
-    if i ~= 1
-        keySet{i} = keySet{i} - keySet{1};
-    end
+for i=2:1:length(map)
+    keySet{i} = keySet{i} - keySet{1};   
 end
 
 map = containers.Map(keySet, valueSet);
