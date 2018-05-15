@@ -17,7 +17,7 @@ function [map] = compressionAlgorithm (ids, vals)
 
 for i=1:1:cluster_data_count
     if vals(i) ~= 0
-        if map.isKey(vals(i)) ~= 1 % 없을 경우
+        if map.isKey(vals(i)) ~= 1 % map 에 없을 경우
             keySet{end+1}=vals(i);
             valueSet = [valueSet sprintf('%d',ids(i))];
             map = containers.Map(keySet, valueSet);
@@ -31,11 +31,11 @@ for i=1:1:cluster_data_count
 end
 
 keySet = map.keys;
-for i=2:1:length(map)
+for i=2:1:length(map) % 차분 처리
     keySet{i} = keySet{i} - keySet{1};   
 end
 
-map = containers.Map(keySet, valueSet);
+map = containers.Map(keySet, valueSet); % 결과 전달
 
 end
 
