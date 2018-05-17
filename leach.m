@@ -46,7 +46,7 @@ do=sqrt(Efs/Emp);
 IS_INITIL_LEACH = false;
 
 %병합 처리 여부
-IS_MERGE = true;
+IS_MERGE = false;
 
 cluster_data_count = 20;
 leach_data = [];
@@ -211,9 +211,9 @@ for leach_round=2:1:3
     % string to 16 bits
     
     % packetLength = length(dec2bin(round_sensing_data, 16) - '0')*16;
-    packetLength = length(dec2bin(round_sensing_data) - '0')*16;
+    packetLength = numel(dec2bin(round_sensing_data) - '0');
     if IS_MERGE && leach_round == 2
-        packetLength = compressionLZW(round_sensing_data)*16;
+        packetLength = compressionLZW(round_sensing_data);
     end
     % 0~20 까지 데이터 출력용
     if r < 20
@@ -287,7 +287,7 @@ for leach_round=2:1:3
                      S(i).E = S(i).E-((ETX)*packetLength+ Efs*packetLength*(distance*distance)); 
                 end
                 % 병합 에너지 처리
-                unzipPacketLength = length(dec2bin(unzip_round_sensing_data) - '0')*16;
+                unzipPacketLength = numel(dec2bin(unzip_round_sensing_data) - '0');
                 S(i).E = S(i).E-(EDA * unzipPacketLength);
                 % 차분 데이터 압축의 경우 패키지 사이즈로 에너시 소비 추가
                 if ( r ~= 0 && IS_INITIL_LEACH && IS_MERGE )
@@ -335,7 +335,7 @@ for leach_round=2:1:3
                 nodeData = sprintf('%d:%d', i, (sensing_data(r+1, i)*10));
             end
 
-            nodePacketLength = length(dec2bin(nodeData, 16) - '0')*16;
+            nodePacketLength = numel(dec2bin(nodeData, 16) - '0');
             
              %Energy dissipated by associated Cluster Head
              min_dis;
@@ -407,7 +407,7 @@ end
 plot(lzw_data(1, [1:rmax]), lzw_data(2, [1:rmax]), '--', initil_leach_data(1, [1:rmax]), initil_leach_data(2, [1:rmax]), 'r-');
 xlabel('Round');
 ylabel('Number of Live Node');
-legend('LEACH','Proposal');
+legend('Normal','Proposal');
 hold on;
 
 % fix(mean(leach_data_length))

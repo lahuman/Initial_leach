@@ -46,8 +46,8 @@ end
 k = k+1;
 output(k) = P_code;
 % display(output);
-
-[packLen, n]=  size(dec2bin((sprintf('%s', output).'))-'0');
+% output
+packLen = numel(dec2bin((sprintf('%s', output).'))-'0');
 % str_x = num2str(output);
 % str_x(isspace(str_x)) = ''
 
