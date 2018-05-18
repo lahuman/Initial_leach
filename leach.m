@@ -46,7 +46,7 @@ do=sqrt(Efs/Emp);
 IS_INITIL_LEACH = false;
 
 %병합 처리 여부
-IS_MERGE = false;
+IS_MERGE = true;
 
 cluster_data_count = 20;
 leach_data = [];
