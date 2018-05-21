@@ -43,7 +43,7 @@ rmax=1000;
 do=sqrt(Efs/Emp);
 
 % 초기값 처리 여부
-IS_INITIL_LEACH = true;
+IS_INITIL_LEACH = false;
 
 %병합 처리 여부
 IS_MERGE = true;
@@ -289,6 +289,7 @@ for leach_round=2:1:3
                 % 병합 에너지 처리
                 unzipPacketLength = numel(dec2bin(unzip_round_sensing_data) - '0');
                 S(i).E = S(i).E-(EDA * unzipPacketLength);
+                % S(i).E = S(i).E-(EDA * (packetLength)); % 차분 처리시
                 % 차분 데이터 압축의 경우 패키지 사이즈로 에너시 소비 추가
                 if ( r ~= 0 && IS_INITIL_LEACH && IS_MERGE && leach_round == 3)
                     S(i).E = S(i).E-(EDA * (packetLength));
