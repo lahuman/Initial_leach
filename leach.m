@@ -211,8 +211,8 @@ for leach_round=2:1:3
     % string to 16 bits
     
     % packetLength = length(dec2bin(round_sensing_data, 16) - '0')*16;
-    packetLength = numel(dec2bin(round_sensing_data) - '0');
-    if IS_MERGE && leach_round == 2
+    % packetLength = numel(dec2bin(round_sensing_data) - '0');
+    if IS_MERGE % && leach_round == 2
         packetLength = compressionLZW(round_sensing_data);
     end
     % 0~20 까지 데이터 출력용
