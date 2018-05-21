@@ -46,7 +46,7 @@ do=sqrt(Efs/Emp);
 IS_INITIL_LEACH = false;
 
 %병합 처리 여부
-IS_MERGE = true;
+IS_MERGE = false;
 
 cluster_data_count = 20;
 leach_data = [];
@@ -211,8 +211,8 @@ for leach_round=2:1:3
     % string to 16 bits
     
     % packetLength = length(dec2bin(round_sensing_data, 16) - '0')*16;
-    % packetLength = numel(dec2bin(round_sensing_data) - '0');
-    if IS_MERGE % && leach_round == 2
+    packetLength = numel(dec2bin(round_sensing_data) - '0');
+    if IS_MERGE  && leach_round == 2
         packetLength = compressionLZW(round_sensing_data);
     end
     % 0~20 까지 데이터 출력용
@@ -290,8 +290,8 @@ for leach_round=2:1:3
                 unzipPacketLength = numel(dec2bin(unzip_round_sensing_data) - '0');
                 S(i).E = S(i).E-(EDA * unzipPacketLength);
                 % 차분 데이터 압축의 경우 패키지 사이즈로 에너시 소비 추가
-                if ( r ~= 0 && IS_INITIL_LEACH && IS_MERGE )
-                    S(i).E = S(i).E-(EDA * packetLength);
+                if ( r ~= 0 && IS_INITIL_LEACH && IS_MERGE && leach_round == 3)
+                    S(i).E = S(i).E-(EDA * (packetLength));
                 end
                 
                 
