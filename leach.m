@@ -68,7 +68,7 @@ for i=1:1:n
     % hold on;
 end
 
-for leach_round=2:1:3
+for leach_round=1:1:3
     for i=1:1:n
         %initially there are no cluster heads only nodes
         S(i).type='N';
@@ -77,7 +77,7 @@ for leach_round=2:1:3
     end
     S(n+1).xd=sink.x;
     S(n+1).yd=sink.y;
-    if leach_round == 3
+    if leach_round ~= 1
         IS_INITIL_LEACH = true;
         dead_node_id = zeros(1, n);
     end
@@ -405,13 +405,13 @@ end
 
 %plot(x,y,'r',x,z,'b');
 
-plot(lzw_data(1, [1:rmax]), lzw_data(2, [1:rmax]), '--', initil_leach_data(1, [1:rmax]), initil_leach_data(2, [1:rmax]), 'r-');
+plot(leach_data(1, [1:rmax]), leach_data(2, [1:rmax]), 'b:', lzw_data(1, [1:rmax]), lzw_data(2, [1:rmax]), 'g--', initil_leach_data(1, [1:rmax]), initil_leach_data(2, [1:rmax]), 'r-');
 xlabel('Round');
 ylabel('Number of Live Node');
-legend('LZW+Pro','Proposal');
+legend('Normal', 'LZW+Pro','Proposal');
 hold on;
 
-% fix(mean(leach_data_length))
+fix(mean(leach_data_length))
 fix(mean(lzw_data_length))
 fix(mean(initil_data_length))
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%   STATISTICS GRAPH PLOT SIR   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
