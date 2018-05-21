@@ -43,10 +43,10 @@ rmax=1000;
 do=sqrt(Efs/Emp);
 
 % 초기값 처리 여부
-IS_INITIL_LEACH = false;
+IS_INITIL_LEACH = true;
 
 %병합 처리 여부
-IS_MERGE = false;
+IS_MERGE = true;
 
 cluster_data_count = 20;
 leach_data = [];
@@ -407,7 +407,7 @@ end
 plot(lzw_data(1, [1:rmax]), lzw_data(2, [1:rmax]), '--', initil_leach_data(1, [1:rmax]), initil_leach_data(2, [1:rmax]), 'r-');
 xlabel('Round');
 ylabel('Number of Live Node');
-legend('Normal','Proposal');
+legend('LZW+Pro','Proposal');
 hold on;
 
 % fix(mean(leach_data_length))
