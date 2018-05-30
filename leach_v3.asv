@@ -53,7 +53,7 @@ leach_data = [];
 initil_leach_data = [];
 leach_data_length = zeros(1, rmax);
 initil_data_length = zeros(1, rmax);
-lzw_data_length = zeros(1, rmax);
+pro_data_length = zeros(1, rmax);
 dead_node_id = zeros(1, n);
 
 
@@ -68,7 +68,7 @@ for i=1:1:n
     % hold on;
 end
 
-for leach_round=1:1:3
+for leach_round=1:1:2
     for i=1:1:n
         %initially there are no cluster heads only nodes
         S(i).type='N';
@@ -99,8 +99,8 @@ for leach_round=1:1:3
     for r=0:1:rmax 
      % r
       % make packetData for 20171101 minute data
-      round_sensing_data = '';
-      unzip_round_sensing_data = '';
+      round_sensing_data = [];
+      unzip_round_sensing_data = [];
       round_data = zeros(1, cluster_data_count);
       
       if r ~= 0
@@ -110,21 +110,21 @@ for leach_round=1:1:3
          if (IS_INITIL_LEACH )
             if r == 0
                 % 차분값
-                round_sensing_data = sprintf('%s%d:%d,',round_sensing_data ,(i), (sensing_data(r+1, i)*10));
+                round_sensing_data = [round_sensing_data ,(i), (sensing_data(r+1, i)*10)];
             else
               if (IS_MERGE)
                   % 병합처리시 변화 없는 데이터 전송 안함
-                  % if diff_row_val(i) ~= 0
-                    % round_sensing_data = sprintf('%s%d:%d,',round_sensing_data ,(i*10), (diff_row_val(i)));
-                    round_data(i) = diff_row_val(i);
-                  % end
+                  if diff_row_val(i) ~= 0
+                    round_sensing_data = [round_sensing_data ,(i), (diff_row_val(i))];
+                  % round_data(i) = diff_row_val(i);
+                  end
               else
-                  round_sensing_data = sprintf('%s%d:%d,',round_sensing_data ,(i), (diff_row_val(i)));
+                  round_sensing_data = [round_sensing_data ,(i), (diff_row_val(i))];
               end   
             end
          else 
              % 기본 leach의 경우
-            round_sensing_data = sprintf('%s%d:%d,',round_sensing_data ,(i), (sensing_data(r+1, i)*10));
+            round_sensing_data = [round_sensing_data (i) (sensing_data(r+1, i)*10)];
          end
         % (sensing_data(1, :)*10 ) - (sensing_data(2, :)*10 )
         % sensing_data([1,2], r:i)*10
@@ -168,39 +168,40 @@ for leach_round=1:1:3
     end
     % 병합 처리시 죽은 노드의 특수 ID 값 추가 
     if ( r ~= 0 && IS_INITIL_LEACH && IS_MERGE )
-       round_dead_node_id = '';
+       round_dead_node_id = [];
        this_round_dead_node_id = dead_node_id == 1;
        for i=1:1:n
            if this_round_dead_node_id(i) == 1
-               round_dead_node_id = sprintf('%s|%d', round_dead_node_id, i);
+               round_dead_node_id = [round_dead_node_id i];
            end
        end
        % 죽은 노드 ID 저장
        if ~strcmp(round_dead_node_id, '')
-        round_sensing_data = sprintf('%s%d:%d,',round_sensing_data ,-1, round_dead_node_id);
+        round_sensing_data = [round_sensing_data round_dead_node_id];
        end
        % 데이터 병합값 생성
        % 기준 값
-       round_data_min = min(round_data);
+       %round_data_min = min(round_data);
        % 기준값으로 차분값 처리
-       round_data = round_data-round_data_min;
-       round_data_unique = unique(round_data);
+       %round_data = round_data-round_data_min;
+       %round_data_unique = unique(round_data);
        
        % 병합처리
        % strrep(strtrim(cellstr(num2str(A))), '  ', '|')
-       for i=1:1:length(round_data_unique)
-           ids_val =  char(regexprep(strtrim(cellstr(num2str(find(round_data==round_data_unique(i))))), '\s+', '|'));
+       
+       %for i=1:1:length(round_data_unique)
+       %    ids_val =  char(regexprep(strtrim(cellstr(num2str(find(round_data==round_data_unique(i))))), '\s+', '|'));
            
-           if round_data_unique(i) == 0
-               round_sensing_data = sprintf('%s0|%s:%d,',round_sensing_data, ids_val, round_data_min);
-           else
+       %    if round_data_unique(i) == 0
+       %        round_sensing_data = sprintf('%s0|%s:%d,',round_sensing_data, ids_val, round_data_min);
+       %    else
               
-               if (round_data_unique(i) - abs(round_data_min)) ~= 0
-                round_sensing_data = sprintf('%s%s:%d,',round_sensing_data, ids_val, round_data_unique(i));
-               end
+       %        if (round_data_unique(i) - abs(round_data_min)) ~= 0
+       %         round_sensing_data = sprintf('%s%s:%d,',round_sensing_data, ids_val, round_data_unique(i));
+       %        end
 
-           end
-       end
+       %   end
+       % end
        round_sensing_data;
        % round_sensing_data = sprintf('%s%d:%d,',round_sensing_data ,(i*10), (diff_row_val(i)));
        
@@ -211,20 +212,21 @@ for leach_round=1:1:3
     % string to 16 bits
     
     % packetLength = length(dec2bin(round_sensing_data, 16) - '0')*16;
-    packetLength = numel(dec2bin(round_sensing_data) - '0');
-    if IS_MERGE  && leach_round == 2
-        packetLength = compressionLZW(round_sensing_data);
-    end
+    [round_row round_column] = size(
+    packetLength = numel(dec2bin(abs(round_sensing_data)));
+   % if IS_MERGE  && leach_round == 2
+   %     packetLength = compressionLZW(round_sensing_data);
+   % end
     % 0~20 까지 데이터 출력용
     if r < 20
         fprintf('round :%d\n', leach_round); 
-        fprintf('packetLen:%d, data: %s\n',packetLength, round_sensing_data); 
+        fprintf('packetLen:%d, data: %d\n',packetLength, round_sensing_data); 
     end
     
     if leach_round == 1 
         leach_data_length((r+1)) = packetLength;
     elseif leach_round == 2
-        lzw_data_length((r+1)) = packetLength;
+        pro_data_length((r+1)) = packetLength;
     else
         initil_data_length((r+1)) = packetLength;
     end 
@@ -287,7 +289,7 @@ for leach_round=1:1:3
                      S(i).E = S(i).E-((ETX)*packetLength+ Efs*packetLength*(distance*distance)); 
                 end
                 % 병합 에너지 처리
-                unzipPacketLength = numel(dec2bin(unzip_round_sensing_data) - '0');
+                unzipPacketLength = numel(dec2bin(abs(unzip_round_sensing_data)));
                 S(i).E = S(i).E-(EDA * unzipPacketLength);
                 % S(i).E = S(i).E-(EDA * (packetLength)); % 차분 처리시
                 % 차분 데이터 압축의 경우 패키지 사이즈로 에너시 소비 추가
@@ -405,14 +407,14 @@ end
 
 %plot(x,y,'r',x,z,'b');
 
-plot(leach_data(1, [1:rmax]), leach_data(2, [1:rmax]), 'b:', initil_leach_data(1, [1:rmax]), initil_leach_data(2, [1:rmax]), 'r-');
+plot(leach_data(1, [1:rmax]), leach_data(2, [1:rmax]), 'b:', lzw_data(1, [1:rmax]), lzw_data(2, [1:rmax]), 'r-');
 xlabel('Round');
 ylabel('Number of Live Node');
-legend('Normal', 'LZW+Pro','Proposal');
+legend('Normal', 'Proposal');
 hold on;
 
 fix(mean(leach_data_length))
-fix(mean(lzw_data_length))
+fix(mean(pro_data_length))
 fix(mean(initil_data_length))
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%   STATISTICS GRAPH PLOT SIR   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                                                                                     %

@@ -111,13 +111,13 @@ for leach_round=1:1:3
             % 차분 처리
             diff_node_val = (sensing_data(r+1, i)*10)-diff_cluster_val;
             if diff_node_val < 0
-                round_sensing_data = [round_sensing_data de2bi(abs(diff_node_val)) 1];
+                round_sensing_data = [round_sensing_data diff_node_val];
             else
-                round_sensing_data = [round_sensing_data de2bi((sensing_data(r+1, i)*10)-diff_cluster_val)];
+                round_sensing_data = [round_sensing_data ((sensing_data(r+1, i)*10)-diff_cluster_val)];
             end
          else 
              % 기본 leach의 경우
-            round_sensing_data = [round_sensing_data de2bi(sensing_data(r+1, i)*10)];
+            round_sensing_data = [round_sensing_data (sensing_data(r+1, i)*10)];
          end
        end
       unzip_round_sensing_data = round_sensing_data;
@@ -162,14 +162,18 @@ for leach_round=1:1:3
     % string to 16 bits
     
     % packetLength = length(dec2bin(round_sensing_data, 16) - '0')*16;
-    packetLength = numel((round_sensing_data));
+    [round_row,round_column] = size(dec2bin(abs(round_sensing_data)));
+    round_column = round_column+1; % 음수 처리
+    packetLength = round_row * round_column;
+    
     if IS_MERGE  && leach_round == 2
         packetLength = compressionLZW(round_sensing_data);
     end
     % 0~20 까지 데이터 출력용
     if r < 20
         fprintf('round :%d\n', leach_round); 
-        fprintf('packetLen:%d, data: %s\n',packetLength, bi2de(round_sensing_data)); 
+        fprintf('packetLen:%d, data: ',packetLength); 
+        round_sensing_data
     end
     
     if leach_round == 1 
@@ -238,11 +242,11 @@ for leach_round=1:1:3
                      S(i).E = S(i).E-((ETX)*packetLength+ Efs*packetLength*(distance*distance)); 
                 end
                 % 병합 에너지 처리
-                unzipPacketLength = numel(dec2bin(unzip_round_sensing_data) - '0');
+                unzipPacketLength = numel(dec2bin(abs(unzip_round_sensing_data)));
                 S(i).E = S(i).E-(EDA * unzipPacketLength);
                 % S(i).E = S(i).E-(EDA * (packetLength)); % 차분 처리시
                 % 차분 데이터 압축의 경우 패키지 사이즈로 에너시 소비 추가
-                if ( r == 2  && IS_INITIL_LEACH && IS_MERGE && leach_round == 3)
+                if ( r == 2  && IS_INITIL_LEACH && IS_MERGE )
                     S(i).E = S(i).E-(EDA * (packetLength));
                 end
                 
@@ -280,7 +284,7 @@ for leach_round=1:1:3
             if (IS_INITIL_LEACH )
                 nodeData = de2bi(abs((sensing_data(r+1, i)*10)-sensing_data(r+1, cluster_data_count+1)*10));
             else
-                nodeData = de2bi((sensing_data(r+1, i)*10));
+                nodeData = (sensing_data(r+1, i)*10);
             end
 
             nodePacketLength = numel(nodeData);
@@ -353,7 +357,7 @@ end
 %plot(x,y,'r',x,z,'b');
 
 % plot(leach_data(1, [1:rmax]), leach_data(2, [1:rmax]), 'b:', lzw_data(1, [1:rmax]), lzw_data(2, [1:rmax]), 'g--', initil_leach_data(1, [1:rmax]), initil_leach_data(2, [1:rmax]), 'r-');
-plot(lzw_data(1, [1:rmax]), lzw_data(2, [1:rmax]), 'b:', initil_leach_data(1, [1:rmax]), initil_leach_data(2, [1:rmax]), 'r-');
+plot(leach_data(1, [1:rmax]), leach_data(2, [1:rmax]), 'b:', initil_leach_data(1, [1:rmax]), initil_leach_data(2, [1:rmax]), 'r-');
 xlabel('Round');
 ylabel('Number of Live Node');
 legend('Normal','Proposal');
