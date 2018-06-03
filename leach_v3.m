@@ -216,7 +216,7 @@ for leach_round=1:1:2
     round_column = round_column+1; % 음수 처리
     packetLength = round_row * round_column;
    % if IS_MERGE  && leach_round == 2
-   packetLength = compressionLZW(round_sensing_data);
+   %packetLength = compressionLZW(round_sensing_data);
    % end
     % 0~20 까지 데이터 출력용
     if r < 20
@@ -409,7 +409,7 @@ end
 
 %plot(x,y,'r',x,z,'b');
 
-plot(leach_data(1, [1:rmax]), leach_data(2, [1:rmax]), 'b:', lzw_data(1, [1:rmax]), lzw_data(2, [1:rmax]), 'r-');
+plot(leach_data(1, [1:rmax]), leach_data(2, [1:rmax]), 'b--', lzw_data(1, [1:rmax]), lzw_data(2, [1:rmax]), 'r-');
 xlabel('Round');
 ylabel('Number of Live Node');
 legend('Normal', 'Proposal');

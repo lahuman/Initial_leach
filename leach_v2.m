@@ -363,7 +363,7 @@ end
 %plot(x,y,'r',x,z,'b');
 
 % plot(leach_data(1, [1:rmax]), leach_data(2, [1:rmax]), 'b:', lzw_data(1, [1:rmax]), lzw_data(2, [1:rmax]), 'g--', initil_leach_data(1, [1:rmax]), initil_leach_data(2, [1:rmax]), 'r-');
-plot(leach_data(1, [1:rmax]), leach_data(2, [1:rmax]), 'b:', initil_leach_data(1, [1:rmax]), initil_leach_data(2, [1:rmax]), 'r-');
+plot(leach_data(1, [1:rmax]), leach_data(2, [1:rmax]), 'b--', initil_leach_data(1, [1:rmax]), initil_leach_data(2, [1:rmax]), 'r-');
 xlabel('Round');
 ylabel('Number of Live Node');
 legend('Normal','Proposal');
