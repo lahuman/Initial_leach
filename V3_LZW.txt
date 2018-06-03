@@ -1,0 +1,520 @@
+>> leach_v3
+round :1
+packetLen:240, data: 
+round_sensing_data =
+
+  Columns 1 through 18
+
+     1   166     2    71     3   104     4   142     5   132     6    87     7    92     8   107     9   112
+
+  Columns 19 through 36
+
+    10   130    11   132    12    91    13    32    14    17    15   138    16    15    17    75    18    81
+
+  Columns 37 through 40
+
+    19    46    20    60
+
+round :1
+packetLen:240, data: 
+round_sensing_data =
+
+  Columns 1 through 18
+
+     1   166     2    71     3   103     4   142     5   132     6    88     7    92     8   106     9   113
+
+  Columns 19 through 36
+
+    10   130    11   132    12    89    13    31    14    17    15   139    16    15    17    75    18    81
+
+  Columns 37 through 40
+
+    19    47    20    60
+
+round :1
+packetLen:240, data: 
+round_sensing_data =
+
+  Columns 1 through 18
+
+     1   167     2    71     3   102     4   142     5   132     6    89     7    93     8   105     9   113
+
+  Columns 19 through 36
+
+    10   129    11   129    12    90    13    31    14    17    15   139    16    15    17    75    18    81
+
+  Columns 37 through 40
+
+    19    47    20    60
+
+round :1
+packetLen:273, data: 
+round_sensing_data =
+
+  Columns 1 through 18
+
+     1   167     2    71     3   103     4   142     5   132     6    88     7    92     8   105     9   114
+
+  Columns 19 through 36
+
+    10   129    11   126    12    91    13    30    14    17    15   139    16    14    17    75    18    81
+
+  Columns 37 through 40
+
+    19    47    20    60
+
+round :1
+packetLen:240, data: 
+round_sensing_data =
+
+  Columns 1 through 18
+
+     1   167     2    71     3   103     4   142     5   133     6    87     7    92     8   105     9   114
+
+  Columns 19 through 36
+
+    10   129    11   127    12    91    13    30    14    16    15   138    16    14    17    76    18    81
+
+  Columns 37 through 40
+
+    19    47    20    60
+
+round :1
+packetLen:273, data: 
+round_sensing_data =
+
+  Columns 1 through 18
+
+     1   167     2    71     3   104     4   142     5   133     6    86     7    95     8   105     9   114
+
+  Columns 19 through 36
+
+    10   129    11   122    12    91    13    31    14    17    15   137    16    14    17    75    18    81
+
+  Columns 37 through 40
+
+    19    47    20    60
+
+round :1
+packetLen:240, data: 
+round_sensing_data =
+
+  Columns 1 through 18
+
+     1   167     2    71     3   104     4   142     5   133     6    85     7    97     8   107     9   116
+
+  Columns 19 through 36
+
+    10   129    11   121    12    89    13    30    14    17    15   136    16    13    17    75    18    82
+
+  Columns 37 through 40
+
+    19    47    20    60
+
+round :1
+packetLen:240, data: 
+round_sensing_data =
+
+  Columns 1 through 18
+
+     1   167     2    72     3   103     4   142     5   133     6    87     7    98     8   108     9   116
+
+  Columns 19 through 36
+
+    10   128    11   122    12    90    13    30    14    18    15   136    16    13    17    75    18    83
+
+  Columns 37 through 40
+
+    19    47    20    60
+
+round :1
+packetLen:240, data: 
+round_sensing_data =
+
+  Columns 1 through 18
+
+     1   166     2    71     3   103     4   142     5   132     6    89     7   101     8   108     9   113
+
+  Columns 19 through 36
+
+    10   129    11   123    12    90    13    30    14    18    15   136    16    12    17    74    18    84
+
+  Columns 37 through 40
+
+    19    47    20    60
+
+round :1
+packetLen:240, data: 
+round_sensing_data =
+
+  Columns 1 through 18
+
+     1   166     2    71     3   104     4   142     5   133     6    89     7   103     8   108     9   112
+
+  Columns 19 through 36
+
+    10   129    11   121    12    89    13    31    14    17    15   136    16    11    17    75    18    85
+
+  Columns 37 through 40
+
+    19    46    20    61
+
+round :1
+packetLen:240, data: 
+round_sensing_data =
+
+  Columns 1 through 18
+
+     1   166     2    71     3   104     4   142     5   133     6    89     7   108     8   109     9   111
+
+  Columns 19 through 36
+
+    10   129    11   120    12    90    13    31    14    17    15   136    16    11    17    75    18    86
+
+  Columns 37 through 40
+
+    19    46    20    60
+
+round :1
+packetLen:240, data: 
+round_sensing_data =
+
+  Columns 1 through 18
+
+     1   166     2    71     3   103     4   142     5   133     6    89     7   110     8   107     9   110
+
+  Columns 19 through 36
+
+    10   129    11   122    12    91    13    31    14    17    15   135    16    10    17    72    18    88
+
+  Columns 37 through 40
+
+    19    46    20    60
+
+round :1
+packetLen:240, data: 
+round_sensing_data =
+
+  Columns 1 through 18
+
+     1   166     2    72     3   103     4   142     5   133     6    88     7   113     8   107     9   110
+
+  Columns 19 through 36
+
+    10   128    11   123    12    90    13    31    14    17    15   135    16    10    17    73    18    88
+
+  Columns 37 through 40
+
+    19    46    20    60
+
+round :1
+packetLen:240, data: 
+round_sensing_data =
+
+  Columns 1 through 18
+
+     1   165     2    72     3   102     4   142     5   132     6    87     7   115     8   107     9   108
+
+  Columns 19 through 36
+
+    10   128    11   122    12    87    13    31    14    16    15   136    16    10    17    74    18    87
+
+  Columns 37 through 40
+
+    19    46    20    60
+
+round :1
+packetLen:240, data: 
+round_sensing_data =
+
+  Columns 1 through 18
+
+     1   165     2    72     3   101     4   142     5   132     6    88     7   114     8   107     9    98
+
+  Columns 19 through 36
+
+    10   127    11   123    12    85    13    31    14    17    15   136    16    10    17    74    18    86
+
+  Columns 37 through 40
+
+    19    46    20    60
+
+round :1
+packetLen:240, data: 
+round_sensing_data =
+
+  Columns 1 through 18
+
+     1   165     2    72     3   101     4   142     5   132     6    91     7   106     8   108     9    98
+
+  Columns 19 through 36
+
+    10   127    11   127    12    85    13    30    14    18    15   136    16    10    17    74    18    84
+
+  Columns 37 through 40
+
+    19    46    20    60
+
+round :1
+packetLen:240, data: 
+round_sensing_data =
+
+  Columns 1 through 18
+
+     1   165     2    72     3   100     4   142     5   132     6    92     7   103     8   109     9    99
+
+  Columns 19 through 36
+
+    10   127    11   131    12    87    13    30    14    19    15   136    16    10    17    73    18    81
+
+  Columns 37 through 40
+
+    19    46    20    60
+
+round :1
+packetLen:240, data: 
+round_sensing_data =
+
+  Columns 1 through 18
+
+     1   166     2    71     3    99     4   142     5   132     6    91     7   101     8   108     9    88
+
+  Columns 19 through 36
+
+    10   126    11   129    12    90    13    29    14    19    15   136    16    10    17    73    18    78
+
+  Columns 37 through 40
+
+    19    46    20    60
+
+round :1
+packetLen:240, data: 
+round_sensing_data =
+
+  Columns 1 through 18
+
+     1   166     2    71     3    99     4   141     5   133     6    88     7   100     8   107     9    82
+
+  Columns 19 through 36
+
+    10   126    11   127    12    93    13    28    14    18    15   135    16    10    17    73    18    76
+
+  Columns 37 through 40
+
+    19    47    20    60
+
+round :1
+packetLen:240, data: 
+round_sensing_data =
+
+  Columns 1 through 18
+
+     1   166     2    71     3    98     4   141     5   133     6    88     7   100     8   106     9    80
+
+  Columns 19 through 36
+
+    10   126    11   125    12    92    13    28    14    19    15   136    16    10    17    74    18    75
+
+  Columns 37 through 40
+
+    19    48    20    60
+
+round :2
+packetLen:240, data: 
+round_sensing_data =
+
+  Columns 1 through 18
+
+     1   166     2    71     3   104     4   142     5   132     6    87     7    92     8   107     9   112
+
+  Columns 19 through 36
+
+    10   130    11   132    12    91    13    32    14    17    15   138    16    15    17    75    18    81
+
+  Columns 37 through 40
+
+    19    46    20    60
+
+round :2
+packetLen:64, data: 
+round_sensing_data =
+
+     3    -1     6     1     8    -1     9     1    12    -2    13    -1    15     1    19     1
+
+round :2
+packetLen:64, data: 
+round_sensing_data =
+
+     1     1     3    -1     6     1     7     1     8    -1    10    -1    11    -3    12     1
+
+round :2
+packetLen:64, data: 
+round_sensing_data =
+
+     3     1     6    -1     7    -1     9     1    11    -3    12     1    13    -1    16    -1
+
+round :2
+packetLen:48, data: 
+round_sensing_data =
+
+     5     1     6    -1    11     1    14    -1    15    -1    17     1
+
+round :2
+packetLen:64, data: 
+round_sensing_data =
+
+     3     1     6    -1     7     3    11    -5    13     1    14     1    15    -1    17    -1
+
+round :2
+packetLen:80, data: 
+round_sensing_data =
+
+  Columns 1 through 18
+
+     6    -1     7     2     8     2     9     2    11    -1    12    -2    13    -1    15    -1    16    -1
+
+  Columns 19 through 20
+
+    18     1
+
+round :2
+packetLen:80, data: 
+round_sensing_data =
+
+  Columns 1 through 18
+
+     2     1     3    -1     6     2     7     1     8     1    10    -1    11     1    12     1    14     1
+
+  Columns 19 through 20
+
+    18     1
+
+round :2
+packetLen:88, data: 
+round_sensing_data =
+
+  Columns 1 through 18
+
+     1    -1     2    -1     5    -1     6     2     7     3     9    -3    10     1    11     1    16    -1
+
+  Columns 19 through 22
+
+    17    -1    18     1
+
+round :2
+packetLen:130, data: 
+round_sensing_data =
+
+  Columns 1 through 18
+
+     3     1     5     1     7     2     9    -1    11    -2    12    -1    13     1    14    -1    16    -1
+
+  Columns 19 through 26
+
+    17     1    18     1    19    -1    20     1
+
+round :2
+packetLen:56, data: 
+round_sensing_data =
+
+     7     5     8     1     9    -1    11    -1    12     1    18     1    20    -1
+
+round :2
+packetLen:80, data: 
+round_sensing_data =
+
+  Columns 1 through 18
+
+     3    -1     7     2     8    -2     9    -1    11     2    12     1    15    -1    16    -1    17    -3
+
+  Columns 19 through 20
+
+    18     2
+
+round :2
+packetLen:56, data: 
+round_sensing_data =
+
+     2     1     6    -1     7     3    10    -1    11     1    12    -1    17     1
+
+round :2
+packetLen:120, data: 
+round_sensing_data =
+
+  Columns 1 through 18
+
+     1    -1     3    -1     5    -1     6    -1     7     2     9    -2    11    -1    12    -3    14    -1
+
+  Columns 19 through 24
+
+    15     1    17     1    18    -1
+
+round :2
+packetLen:72, data: 
+round_sensing_data =
+
+     3    -1     6     1     7    -1     9   -10    10    -1    11     1    12    -2    14     1    18    -1
+
+round :2
+packetLen:56, data: 
+round_sensing_data =
+
+     6     3     7    -8     8     1    11     4    13    -1    14     1    18    -2
+
+round :2
+packetLen:80, data: 
+round_sensing_data =
+
+  Columns 1 through 18
+
+     3    -1     6     1     7    -3     8     1     9     1    11     4    12     2    14     1    17    -1
+
+  Columns 19 through 20
+
+    18    -3
+
+round :2
+packetLen:120, data: 
+round_sensing_data =
+
+  Columns 1 through 18
+
+     1     1     2    -1     3    -1     6    -1     7    -2     8    -1     9   -11    10    -1    11    -2
+
+  Columns 19 through 24
+
+    12     3    13    -1    18    -3
+
+round :2
+packetLen:130, data: 
+round_sensing_data =
+
+  Columns 1 through 18
+
+     4    -1     5     1     6    -3     7    -1     8    -1     9    -6    11    -2    12     3    13    -1
+
+  Columns 19 through 26
+
+    14    -1    15    -1    18    -2    19     1
+
+round :2
+packetLen:80, data: 
+round_sensing_data =
+
+  Columns 1 through 18
+
+     3    -1     8    -1     9    -2    11    -2    12    -1    14     1    15     1    17     1    18    -1
+
+  Columns 19 through 20
+
+    19     1
+
+
+ans =
+
+   240
+
+
+ans =
+
+    93

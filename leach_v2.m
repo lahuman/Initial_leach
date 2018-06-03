@@ -3,7 +3,7 @@
 clear;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% PARAMETERS %%%%%%%%%%%%%%%%%%%%%%%%%%%%
-sensing_data = csvread('day_data.csv');
+sensing_data = csvread('day_data_2.csv');
 %Field Dimensions - x and y maximum (in meters)
 xm = 300;
 ym = 300;
@@ -103,18 +103,19 @@ for leach_round=1:1:3
       unzip_round_sensing_data=[];
       round_data = zeros(1, cluster_data_count);
       
+      diff_cluster_val = sensing_data(r+1, cluster_data_count+4)*10;
+      round_sensing_data = [diff_cluster_val];
       for i=1:1:cluster_data_count
           % cluster header sesing value
-          diff_cluster_val = sensing_data(r+1, cluster_data_count+1)*10;
-            
+          
          if (IS_INITIL_LEACH )
             % 차분 처리
             diff_node_val = (sensing_data(r+1, i)*10)-diff_cluster_val;
-            if diff_node_val < 0
+            %if diff_node_val < 0
                 round_sensing_data = [round_sensing_data diff_node_val];
-            else
-                round_sensing_data = [round_sensing_data ((sensing_data(r+1, i)*10)-diff_cluster_val)];
-            end
+            %else
+            %    round_sensing_data = [round_sensing_data ((sensing_data(r+1, i)*10)-diff_cluster_val)];
+            %end
          else 
              % 기본 leach의 경우
             round_sensing_data = [round_sensing_data (sensing_data(r+1, i)*10)];
@@ -166,6 +167,9 @@ for leach_round=1:1:3
     round_column = round_column+1; % 음수 처리
     packetLength = round_row * round_column;
     
+    if leach_round == 3
+     packetLength = numel(dec2bin(abs(round_sensing_data)));
+    end
     if IS_MERGE  && leach_round == 2
         packetLength = compressionLZW(round_sensing_data);
     end
@@ -280,13 +284,15 @@ for leach_round=1:1:3
                 S(i).E = S(i).E - ETX * ctrPacketLength;
              end
 
+             
              % Node data
             if (IS_INITIL_LEACH )
-                nodeData = de2bi(abs((sensing_data(r+1, i)*10)-sensing_data(r+1, cluster_data_count+1)*10));
+                nodeData = abs((sensing_data(r+1, i)*10)-sensing_data(r+1, cluster_data_count+4)*10);
             else
                 nodeData = (sensing_data(r+1, i)*10);
             end
 
+         
             nodePacketLength = numel(nodeData);
             
              %Energy dissipated by associated Cluster Head
