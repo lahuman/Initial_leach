@@ -3,7 +3,7 @@
 clear;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% PARAMETERS %%%%%%%%%%%%%%%%%%%%%%%%%%%%
-sensing_data = csvread('day_data_2.csv');
+sensing_data = csvread('day_data.csv');
 %Field Dimensions - x and y maximum (in meters)
 xm = 300;
 ym = 300;
@@ -177,7 +177,7 @@ for leach_round=1:1:3
     if r < 20
         fprintf('round :%d\n', leach_round); 
         fprintf('packetLen:%d, data: ',packetLength); 
-        round_sensing_data
+        jsonencode(round_sensing_data)
     end
     
     if leach_round == 1 
