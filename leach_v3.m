@@ -20,8 +20,10 @@ n = 200;
 %Optimal Election Probability of a node to become cluster head
 p=0.05;
 packetLength =6400;
-ctrPacketLength = 200;
+%ctrPacketLength = 200;
 diffPacketLength = 50; % 차분 패킷
+ctrPacketLength = 150;
+%diffPacketLength = 1; % 차분 패킷
 %Energy Model (all values in Joules)
 %Initial Energy 
 Eo = 0.5;
@@ -102,6 +104,18 @@ for leach_round=1:1:2
       round_sensing_data = [];
       unzip_round_sensing_data = [];
       round_data = zeros(1, cluster_data_count);
+      live_node = 0;
+      
+      for i=1:1:n
+       if (S(i).E>0) 
+        live_node = live_node +1;
+       end
+      end
+      c_node = 1;
+      if live_node * p > 0
+          c_node = live_node * p;
+      end
+      cluster_data_count = int8(live_node / c_node);
       
       if r ~= 0
           diff_row_val = (sensing_data(r+1, 1:cluster_data_count)*10)-(sensing_data(r, 1:cluster_data_count)*10);
@@ -215,6 +229,14 @@ for leach_round=1:1:2
     [round_row,round_column] = size(dec2bin(abs(round_sensing_data)));
     round_column = round_column+1; % 음수 처리
     packetLength = round_row * round_column;
+    
+    
+    % packetLength = packetLength * 10;
+    %if leach_round == 1
+    %    packetLength = 100000
+    %else 
+    %    packetLength = 50000
+    %end
    % if IS_MERGE  && leach_round == 2
    %packetLength = compressionLZW(round_sensing_data);
    % end
@@ -224,6 +246,7 @@ for leach_round=1:1:2
         fprintf('packetLen:%d, data: ',packetLength); 
         round_sensing_data
     end
+    
     
     if leach_round == 1 
         leach_data_length((r+1)) = packetLength;
@@ -412,7 +435,7 @@ end
 plot(leach_data(1, [1:rmax]), leach_data(2, [1:rmax]), 'b--', lzw_data(1, [1:rmax]), lzw_data(2, [1:rmax]), 'r-');
 xlabel('Round');
 ylabel('Number of Live Node');
-legend('Normal', 'Proposal');
+legend('LEACH', 'DDP','Location','southwest');
 hold on;
 
 fix(mean(leach_data_length))
