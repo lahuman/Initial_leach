@@ -22,7 +22,7 @@ p=0.05;
 packetLength =6400;
 %ctrPacketLength = 200;
 diffPacketLength = 50; % 차분 패킷
-ctrPacketLength = 150;
+ctrPacketLength = 200;
 %diffPacketLength = 1; % 차분 패킷
 %Energy Model (all values in Joules)
 %Initial Energy 
@@ -106,16 +106,16 @@ for leach_round=1:1:2
       round_data = zeros(1, cluster_data_count);
       live_node = 0;
       
-      for i=1:1:n
-       if (S(i).E>0) 
-        live_node = live_node +1;
-       end
-      end
-      c_node = 1;
-      if live_node * p > 0
-          c_node = live_node * p;
-      end
-      cluster_data_count = int8(live_node / c_node);
+      %for i=1:1:n
+      % if (S(i).E>0) 
+      %  live_node = live_node +1;
+      % end
+      %end
+      %c_node = 1;
+      %if live_node * p > 0
+      %    c_node = live_node * p;
+      %end
+      %cluster_data_count = int8(live_node / c_node);
       
       if r ~= 0
           diff_row_val = (sensing_data(r+1, 1:cluster_data_count)*10)-(sensing_data(r, 1:cluster_data_count)*10);
@@ -147,7 +147,20 @@ for leach_round=1:1:2
       
 
       %Operation for epoch
-      if(mod(r, round(1/p))==0)
+      can_be_cluster_header_cnt = 0;
+      for i=1:1:n
+          if S(i).G == 0
+              can_be_cluster_header_cnt = can_be_cluster_header_cnt + 1;
+          end
+      end
+      if can_be_cluster_header_cnt == 0
+          S(i).G=0;
+          S(i).cl=0;
+      end
+      
+      
+      %if(mod(r, round(1/p))==0)
+      if(mod(r, 22)==0)
          for i=1:1:n
             S(i).G=0;
             S(i).cl=0;
@@ -231,7 +244,7 @@ for leach_round=1:1:2
     packetLength = round_row * round_column;
     
     
-    % packetLength = packetLength * 10;
+    %packetLength = packetLength * 2;
     %if leach_round == 1
     %    packetLength = 100000
     %else 
@@ -435,7 +448,7 @@ end
 plot(leach_data(1, [1:rmax]), leach_data(2, [1:rmax]), 'b--', lzw_data(1, [1:rmax]), lzw_data(2, [1:rmax]), 'r-');
 xlabel('Round');
 ylabel('Number of Live Node');
-legend('LEACH', 'DDP','Location','southwest');
+legend('LEACH', 'Node Base DDP','Location','southwest');
 hold on;
 
 fix(mean(leach_data_length))

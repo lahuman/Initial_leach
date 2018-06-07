@@ -125,7 +125,18 @@ for leach_round=1:1:3
       
 
       %Operation for epoch
-      if(mod(r, round(1/p))==0)
+      %can_be_cluster_header_cnt = 0;
+      %for i=1:1:n
+      %    if S(i).G == 0
+      %        can_be_cluster_header_cnt = can_be_cluster_header_cnt + 1;
+      %    end
+      %end
+      %if can_be_cluster_header_cnt == 0
+      %    S(i).G=0;
+      %    S(i).cl=0;
+      %end
+      %if(mod(r, round(1/p))==0)
+      if(mod(r, 22)==0)
          for i=1:1:n
             S(i).G=0;
             S(i).cl=0;
@@ -366,7 +377,7 @@ end
 plot(leach_data(1, [1:rmax]), leach_data(2, [1:rmax]), 'b--', initil_leach_data(1, [1:rmax]), initil_leach_data(2, [1:rmax]), 'r-');
 xlabel('Round');
 ylabel('Number of Live Node');
-legend('Normal','Proposal');
+legend('LEACH', 'CH Base DDP','Location','southwest');
 %legend('Normal', 'LZW+Pro','Proposal');
 hold on;
 
