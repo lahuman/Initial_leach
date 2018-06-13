@@ -45,7 +45,7 @@ rmax=1000;
 do=sqrt(Efs/Emp);
 
 % 초기값 처리 여부
-IS_INITIL_LEACH = false;
+IS_INITIL_LEACH = true;
 
 %병합 처리 여부
 IS_MERGE = true;
@@ -76,12 +76,15 @@ for leach_round=1:1:2
         S(i).type='N';
         S(i).E=Eo;
         S(i).ENERGY=0;
+        S(i).G=0;
+        S(i).cl=0;
+        dead_node_id = zeros(1, n);
     end
     S(n+1).xd=sink.x;
     S(n+1).yd=sink.y;
     if leach_round ~= 1
-        IS_INITIL_LEACH = true;
-        dead_node_id = zeros(1, n);
+        IS_INITIL_LEACH = false;
+       
     end
     %First Iteration
     figure(1);
@@ -97,8 +100,9 @@ for leach_round=1:1:2
     flag_first_dead=0; 
     
     
-    
-    for r=0:1:rmax 
+    r=-1;
+    while r<=rmax
+        r = r+1;
      % r
       % make packetData for 20171101 minute data
       round_sensing_data = [];
@@ -148,19 +152,34 @@ for leach_round=1:1:2
 
       %Operation for epoch
       can_be_cluster_header_cnt = 0;
+      live_node_cnt = 0;
       for i=1:1:n
-          if S(i).G == 0
+          if S(i).G <= 0
               can_be_cluster_header_cnt = can_be_cluster_header_cnt + 1;
+          end
+          if S(i).E>0
+              live_node_cnt = live_node_cnt +1;
           end
       end
       if can_be_cluster_header_cnt == 0
-          S(i).G=0;
-          S(i).cl=0;
+          for i=1:1:n
+            S(i).G=0;
+            S(i).cl=0;
+         end
       end
       
       
-      %if(mod(r, round(1/p))==0)
-      if(mod(r, 22)==0)
+      
+      if r > 880 && r < 890
+          for i=1:1:n
+              if S(i).E > 0
+                   S(i).E
+              end
+          end
+      end
+      
+      if(mod(r, round(1/p))==0)
+      %if(mod(r, 21)==0)
          for i=1:1:n
             S(i).G=0;
             S(i).cl=0;
@@ -195,6 +214,7 @@ for leach_round=1:1:2
     end
     % 병합 처리시 죽은 노드의 특수 ID 값 추가 
     if ( r ~= 0 && IS_INITIL_LEACH && IS_MERGE )
+    %if false
        round_dead_node_id = [];
        this_round_dead_node_id = dead_node_id == 1;
        for i=1:1:n
@@ -292,7 +312,8 @@ for leach_round=1:1:2
     for i=1:1:n
        if(S(i).E>0)
          temp_rand=rand;     
-         if ((S(i).G)<=0) 
+         if ((S(i).G)<=0)
+         %if true
             %Election of Cluster Heads
             if(temp_rand <=(p/(1-p*mod(r,round(1/p)))))
                 countCHs = countCHs+1;
@@ -343,16 +364,29 @@ for leach_round=1:1:2
        end 
     end
 
+    if (live_node_cnt > 0) && (countCHs == 0)
+        r = r-1;
+        for i=1:1:n
+            S(i).G=0;
+            S(i).cl=0;
+         end
+        continue;
+    end
+    
     STATISTICS(r+1).CLUSTERHEADS = cluster-1;%
     CLUSTERHS(r+1)= cluster-1;
 
+
+    
+    
     %Election of Associated Cluster Head for Normal Nodes
     for i=1:1:n
        if (S(i).type=='N' && S(i).E>0) 
         % min_dis = sqrt( (S(i).xd-S(n+1).xd)^2 + (S(i).yd-S(n+1).yd)^2 );%
          min_dis = INFINITY; 
-         if(cluster-1>=1)
-             min_dis_cluster = 1;
+         if (cluster-1>=1)
+         %if true
+            min_dis_cluster = 1;
 
              for c = 1:1:cluster-1 %
                 %temp = min(min_dis,sqrt( (S(i).xd - C(c).xd)^2 + (S(i).yd - C(c).yd)^2 ) );
@@ -435,9 +469,9 @@ for leach_round=1:1:2
         %z(i)=CLUSTERHS(i);
     end
     if leach_round == 1
-        leach_data = [x;y];
+         lzw_data = [x;y];
     elseif  leach_round == 2
-        lzw_data = [x;y];
+        leach_data = [x;y];
     else
         initil_leach_data = [x;y];
     end
