@@ -54,7 +54,9 @@ cluster_data_count = 20;
 leach_data = [];
 initil_leach_data = [];
 leach_data_length = zeros(1, rmax);
+leach_node_data_length = zeros(1, rmax);
 initil_data_length = zeros(1, rmax);
+initil_node_data_length = zeros(1, rmax);
 pro_data_length = zeros(1, rmax);
 dead_node_id = zeros(1, n);
 
@@ -356,7 +358,9 @@ for leach_round=1:1:2
                     S(i).E = S(i).E-(EDA * (packetLength));
                 end
                 
-                
+                if r == 0
+                     S(i).E 
+                 end
                 packets_TO_BS = packets_TO_BS+1;
                 PACKETS_TO_BS(r+1) = packets_TO_BS;
             end     
@@ -423,9 +427,11 @@ for leach_round=1:1:2
              end
              S(i).E = S(i).E - ETX*(ctrPacketLength);  %
              if ( r ~= 0 && IS_INITIL_LEACH && IS_MERGE )
-                 S(i).E = S(i).E-(EDA*diffPacketLength); % 차분 처리 에너지 소비
+                 S(i).E = S(i).E-(EDA*(nodePacketLength*2)); % 차분 처리 에너지 소비 차분/갱신
              end
-
+             if r == 0
+                 S(i).E 
+             end
              %Energy dissipated 
              if(min_dis > 0)
                 S(C(min_dis_cluster).id).E = S(C(min_dis_cluster).id).E - ((ERX + EDA)*nodePacketLength ); % sensing energy
