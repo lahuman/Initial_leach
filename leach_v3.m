@@ -38,7 +38,7 @@ EDA=5*0.000000001;
 
 INFINITY = 999999999999999;
 %maximum number of rounds
-rmax=1000;
+rmax=900;
 %%%%%%%%%%%%%%%%%%%%%%%%% END OF PARAMETERS %%%%%%%%%%%%%%%%%%%%%%%%
 %Computation of do
 
@@ -98,6 +98,8 @@ for leach_round=1:1:2
     countCHs;
     rcountCHs=rcountCHs+countCHs;
     flag_first_dead=0; 
+    flag_hafe_dead=0; 
+    flag_all_dead=0; 
     
     
     r=-1;
@@ -173,7 +175,7 @@ for leach_round=1:1:2
       if r > 880 && r < 890
           for i=1:1:n
               if S(i).E > 0
-                   S(i).E
+                   S(i).E;
               end
           end
       end
@@ -270,14 +272,14 @@ for leach_round=1:1:2
     %else 
     %    packetLength = 50000
     %end
-   % if IS_MERGE  && leach_round == 2
-   %packetLength = compressionLZW(round_sensing_data);
-   % end
+   %if IS_MERGE  && leach_round == 2
+    % packetLength = compressionLZW(round_sensing_data);
+   %end
     % 0~20 까지 데이터 출력용
     if r < 20
-        fprintf('round :%d\n', leach_round); 
-        fprintf('packetLen:%d, data: ',packetLength); 
-        round_sensing_data
+        %fprintf('round :%d\n', leach_round); 
+        %fprintf('packetLen:%d, data: ',packetLength); 
+        %round_sensing_data
     end
     
     
@@ -304,7 +306,18 @@ for leach_round=1:1:2
         if(flag_first_dead==0)
             first_dead=r;
             flag_first_dead=1;
+            fprintf('dead first :%d\n', r);
         end
+ elseif (dead == 100)
+         if(flag_hafe_dead==0)
+             flag_hafe_dead=1;
+            fprintf('dead hafe :%d\n', r); 
+         end
+    elseif (dead == n)
+         if(flag_all_dead==0)
+             flag_all_dead=1;
+            fprintf('dead all :%d\n', r); 
+         end        
     end
 
     countCHs=0;
@@ -479,10 +492,13 @@ end
 
 %plot(x,y,'r',x,z,'b');
 
-plot(leach_data(1, [1:rmax]), leach_data(2, [1:rmax]), 'b--', lzw_data(1, [1:rmax]), lzw_data(2, [1:rmax]), 'r-');
+l = plot(leach_data(1, [1:rmax]), leach_data(2, [1:rmax]), 'k--', lzw_data(1, [1:rmax]), lzw_data(2, [1:rmax]),'k-');
+l(1).LineWidth = 1;
+l(2).LineWidth = 1;
+
 xlabel('Round');
 ylabel('Number of Live Node');
-legend('LEACH', 'Node Base DDP','Location','southwest');
+legend('LEACH', 'Node ID Base DDP','Location','southwest');
 hold on;
 
 fix(mean(leach_data_length))

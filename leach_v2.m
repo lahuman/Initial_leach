@@ -36,7 +36,7 @@ EDA=5*0.000000001;
 
 INFINITY = 999999999999999;
 %maximum number of rounds
-rmax=1000;
+rmax=900;
 %%%%%%%%%%%%%%%%%%%%%%%%% END OF PARAMETERS %%%%%%%%%%%%%%%%%%%%%%%%
 %Computation of do
 
@@ -46,7 +46,7 @@ do=sqrt(Efs/Emp);
 IS_INITIL_LEACH = false;
 
 %병합 처리 여부
-IS_MERGE = true;
+IS_MERGE = false;
 
 cluster_data_count = 20;
 leach_data = [];
@@ -74,6 +74,12 @@ for leach_round=1:1:3
         S(i).type='N';
         S(i).E=Eo;
         S(i).ENERGY=0;
+        
+       
+        S(i).G=0;
+        S(i).cl=0;
+        dead_node_id = zeros(1, n);
+        
     end
     S(n+1).xd=sink.x;
     S(n+1).yd=sink.y;
@@ -93,8 +99,8 @@ for leach_round=1:1:3
     countCHs;
     rcountCHs=rcountCHs+countCHs;
     flag_first_dead=0; 
-    
-    
+    flag_hafe_dead=0; 
+    flag_all_dead=0; 
     
     for r=0:1:rmax 
      % r
@@ -124,6 +130,25 @@ for leach_round=1:1:3
       unzip_round_sensing_data = round_sensing_data;
       
 
+      
+      can_be_cluster_header_cnt = 0;
+      live_node_cnt = 0;
+      for i=1:1:n
+          if S(i).G <= 0
+              can_be_cluster_header_cnt = can_be_cluster_header_cnt + 1;
+          end
+          if S(i).E>0
+              live_node_cnt = live_node_cnt +1;
+          end
+      end
+      if can_be_cluster_header_cnt == 0
+          for i=1:1:n
+            S(i).G=0;
+            S(i).cl=0;
+         end
+      end
+      
+      
       %Operation for epoch
       %can_be_cluster_header_cnt = 0;
       %for i=1:1:n
@@ -135,8 +160,8 @@ for leach_round=1:1:3
       %    S(i).G=0;
       %    S(i).cl=0;
       %end
-      %if(mod(r, round(1/p))==0)
-      if(mod(r, 22)==0)
+      if(mod(r, round(1/p))==0)
+      %if(mod(r, 22)==0)
          for i=1:1:n
             S(i).G=0;
             S(i).cl=0;
@@ -186,9 +211,10 @@ for leach_round=1:1:3
     end
     % 0~20 까지 데이터 출력용
     if r < 20
-        fprintf('round :%d\n', leach_round); 
-        fprintf('packetLen:%d, data: ',packetLength); 
-        jsonencode(round_sensing_data)
+        %fprintf('round :%d\n', leach_round); 
+        %fprintf('packetLen:%d, data: ',packetLength); 
+        
+        %round_sensing_data
     end
     
     if leach_round == 1 
@@ -214,7 +240,19 @@ for leach_round=1:1:3
         if(flag_first_dead==0)
             first_dead=r;
             flag_first_dead=1;
+            
+            first_dead
         end
+    elseif (dead == 100)
+         if(flag_hafe_dead==0)
+             flag_hafe_dead=1;
+            fprintf('dead hafe :%d\n', r); 
+         end
+    elseif (dead == n)
+         if(flag_all_dead==0)
+             flag_all_dead=1;
+            fprintf('dead all :%d\n', r); 
+         end
     end
 
     countCHs=0;
@@ -273,6 +311,16 @@ for leach_round=1:1:3
        end 
     end
 
+    
+     if (live_node_cnt > 0) && (countCHs == 0)
+        r = r-1;
+        for i=1:1:n
+            S(i).G=0;
+            S(i).cl=0;
+         end
+        continue;
+     end
+    
     STATISTICS(r+1).CLUSTERHEADS = cluster-1;%
     CLUSTERHS(r+1)= cluster-1;
 
@@ -374,7 +422,9 @@ end
 %plot(x,y,'r',x,z,'b');
 
 % plot(leach_data(1, [1:rmax]), leach_data(2, [1:rmax]), 'b:', lzw_data(1, [1:rmax]), lzw_data(2, [1:rmax]), 'g--', initil_leach_data(1, [1:rmax]), initil_leach_data(2, [1:rmax]), 'r-');
-plot(leach_data(1, [1:rmax]), leach_data(2, [1:rmax]), 'b--', initil_leach_data(1, [1:rmax]), initil_leach_data(2, [1:rmax]), 'r-');
+l = plot(leach_data(1, [1:rmax]), leach_data(2, [1:rmax]), 'k--', initil_leach_data(1, [1:rmax]), initil_leach_data(2, [1:rmax]), 'k-');
+l(1).LineWidth = 1;
+l(2).LineWidth = 1;
 xlabel('Round');
 ylabel('Number of Live Node');
 legend('LEACH', 'CH Base DDP','Location','southwest');
