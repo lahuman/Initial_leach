@@ -20,8 +20,10 @@ n = 200;
 %Optimal Election Probability of a node to become cluster head
 p=0.05;
 packetLength =6400;
-ctrPacketLength = 200;
+%ctrPacketLength = 200;
 diffPacketLength = 50; % 차분 패킷
+ctrPacketLength = 200;
+%diffPacketLength = 1; % 차분 패킷
 %Energy Model (all values in Joules)
 %Initial Energy 
 Eo = 0.5;
@@ -43,7 +45,7 @@ rmax=1000;
 do=sqrt(Efs/Emp);
 
 % 초기값 처리 여부
-IS_INITIL_LEACH = false;
+IS_INITIL_LEACH = true;
 
 %병합 처리 여부
 IS_MERGE = true;
@@ -52,6 +54,8 @@ cluster_data_count = 20;
 leach_data = [];
 initil_leach_data = [];
 leach_data_length = zeros(1, rmax);
+leach_node_data_length = zeros(1, rmax);
+initil_data_length = zeros(1, rmax);
 initil_data_length = zeros(1, rmax);
 pro_data_length = zeros(1, rmax);
 dead_node_id = zeros(1, n);
@@ -74,12 +78,15 @@ for leach_round=1:1:2
         S(i).type='N';
         S(i).E=Eo;
         S(i).ENERGY=0;
+        S(i).G=0;
+        S(i).cl=0;
+        dead_node_id = zeros(1, n);
     end
     S(n+1).xd=sink.x;
     S(n+1).yd=sink.y;
     if leach_round ~= 1
-        IS_INITIL_LEACH = true;
-        dead_node_id = zeros(1, n);
+        IS_INITIL_LEACH = false;
+       
     end
     %First Iteration
     figure(1);
@@ -95,8 +102,9 @@ for leach_round=1:1:2
     flag_first_dead=0; 
     
     
-    
-    for r=0:1:rmax 
+    r=-1;
+    while r<=rmax
+        r = r+1;
      % r
       % make packetData for 20171101 minute data
       round_sensing_data = [];
@@ -104,16 +112,16 @@ for leach_round=1:1:2
       round_data = zeros(1, cluster_data_count);
       live_node = 0;
       
-      for i=1:1:n
-       if (S(i).E>0) 
-        live_node = live_node +1;
-       end
-      end
-      c_node = 1;
-      if live_node * 0.05 > 0
-          c_node = live_node * 0.05;
-      end
-      cluster_data_count = int8(live_node / c_node);
+      %for i=1:1:n
+      % if (S(i).E>0) 
+      %  live_node = live_node +1;
+      % end
+      %end
+      %c_node = 1;
+      %if live_node * p > 0
+      %    c_node = live_node * p;
+      %end
+      %cluster_data_count = int8(live_node / c_node);
       
       if r ~= 0
           diff_row_val = (sensing_data(r+1, 1:cluster_data_count)*10)-(sensing_data(r, 1:cluster_data_count)*10);
@@ -145,7 +153,35 @@ for leach_round=1:1:2
       
 
       %Operation for epoch
+      can_be_cluster_header_cnt = 0;
+      live_node_cnt = 0;
+      for i=1:1:n
+          if S(i).G <= 0
+              can_be_cluster_header_cnt = can_be_cluster_header_cnt + 1;
+          end
+          if S(i).E>0
+              live_node_cnt = live_node_cnt +1;
+          end
+      end
+      if can_be_cluster_header_cnt == 0
+          for i=1:1:n
+            S(i).G=0;
+            S(i).cl=0;
+         end
+      end
+      
+      
+      
+      if r > 880 && r < 890
+          for i=1:1:n
+              if S(i).E > 0
+                   S(i).E
+              end
+          end
+      end
+      
       if(mod(r, round(1/p))==0)
+      %if(mod(r, 21)==0)
          for i=1:1:n
             S(i).G=0;
             S(i).cl=0;
@@ -180,6 +216,7 @@ for leach_round=1:1:2
     end
     % 병합 처리시 죽은 노드의 특수 ID 값 추가 
     if ( r ~= 0 && IS_INITIL_LEACH && IS_MERGE )
+    %if false
        round_dead_node_id = [];
        this_round_dead_node_id = dead_node_id == 1;
        for i=1:1:n
@@ -226,10 +263,15 @@ for leach_round=1:1:2
     % packetLength = length(dec2bin(round_sensing_data, 16) - '0')*16;
     [round_row,round_column] = size(dec2bin(abs(round_sensing_data)));
     round_column = round_column+1; % 음수 처리
-    % packetLength = round_row * round_column;
+    packetLength = round_row * round_column;
     
-    if leach_roun
     
+    %packetLength = packetLength * 2;
+    %if leach_round == 1
+    %    packetLength = 100000
+    %else 
+    %    packetLength = 50000
+    %end
    % if IS_MERGE  && leach_round == 2
    %packetLength = compressionLZW(round_sensing_data);
    % end
@@ -239,6 +281,7 @@ for leach_round=1:1:2
         fprintf('packetLen:%d, data: ',packetLength); 
         round_sensing_data
     end
+    
     
     if leach_round == 1 
         leach_data_length((r+1)) = packetLength;
@@ -271,7 +314,8 @@ for leach_round=1:1:2
     for i=1:1:n
        if(S(i).E>0)
          temp_rand=rand;     
-         if ((S(i).G)<=0) 
+         if ((S(i).G)<=0)
+         %if true
             %Election of Cluster Heads
             if(temp_rand <=(p/(1-p*mod(r,round(1/p)))))
                 countCHs = countCHs+1;
@@ -314,7 +358,9 @@ for leach_round=1:1:2
                     S(i).E = S(i).E-(EDA * (packetLength));
                 end
                 
-                
+                if r == 0
+                     S(i).E 
+                 end
                 packets_TO_BS = packets_TO_BS+1;
                 PACKETS_TO_BS(r+1) = packets_TO_BS;
             end     
@@ -322,16 +368,29 @@ for leach_round=1:1:2
        end 
     end
 
+    if (live_node_cnt > 0) && (countCHs == 0)
+        r = r-1;
+        for i=1:1:n
+            S(i).G=0;
+            S(i).cl=0;
+         end
+        continue;
+    end
+    
     STATISTICS(r+1).CLUSTERHEADS = cluster-1;%
     CLUSTERHS(r+1)= cluster-1;
 
+
+    
+    
     %Election of Associated Cluster Head for Normal Nodes
     for i=1:1:n
        if (S(i).type=='N' && S(i).E>0) 
         % min_dis = sqrt( (S(i).xd-S(n+1).xd)^2 + (S(i).yd-S(n+1).yd)^2 );%
          min_dis = INFINITY; 
-         if(cluster-1>=1)
-             min_dis_cluster = 1;
+         if (cluster-1>=1)
+         %if true
+            min_dis_cluster = 1;
 
              for c = 1:1:cluster-1 %
                 %temp = min(min_dis,sqrt( (S(i).xd - C(c).xd)^2 + (S(i).yd - C(c).yd)^2 ) );
@@ -370,7 +429,9 @@ for leach_round=1:1:2
              if ( r ~= 0 && IS_INITIL_LEACH && IS_MERGE )
                  S(i).E = S(i).E-(EDA*diffPacketLength); % 차분 처리 에너지 소비
              end
-
+             if r == 0
+                 S(i).E 
+             end
              %Energy dissipated 
              if(min_dis > 0)
                 S(C(min_dis_cluster).id).E = S(C(min_dis_cluster).id).E - ((ERX + EDA)*nodePacketLength ); % sensing energy
@@ -414,9 +475,9 @@ for leach_round=1:1:2
         %z(i)=CLUSTERHS(i);
     end
     if leach_round == 1
-        leach_data = [x;y];
+         lzw_data = [x;y];
     elseif  leach_round == 2
-        lzw_data = [x;y];
+        leach_data = [x;y];
     else
         initil_leach_data = [x;y];
     end
@@ -427,7 +488,7 @@ end
 plot(leach_data(1, [1:rmax]), leach_data(2, [1:rmax]), 'b--', lzw_data(1, [1:rmax]), lzw_data(2, [1:rmax]), 'r-');
 xlabel('Round');
 ylabel('Number of Live Node');
-legend('Normal', 'Proposal');
+legend('LEACH', 'Node Base DDP','Location','southwest');
 hold on;
 
 fix(mean(leach_data_length))
